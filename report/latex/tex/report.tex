@@ -1,0 +1,118 @@
+%\documentclass[stu, 12pt]{apa7}
+\documentclass[stu, 12pt, floatsintext]{apa7}
+%\usepackage{fontspec}
+%\setmainfont{Times New Roman} % Or your system's equivalent serif font
+\usepackage[american]{babel}
+\usepackage{csquotes}
+\usepackage[style=apa, backend=biber]{biblatex}
+%\usepackage[style=authoryear, backend=biber]{biblatex} % Changed from style=apa
+\usepackage{float}
+\usepackage{multicol}
+\usepackage{hyperref} % nameref is bundled with hyperref
+\usepackage{graphicx}   % Required for including images
+\usepackage{subcaption} % Required for subfigures and subcaptions
+%\usepackage{listings}
+%\usepackage{xcolor}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{enumitem,xcolor}
+
+% Define the console style before using it
+%\lstdefinestyle{console}{
+	%	backgroundcolor=\color{black!5},
+	%	basicstyle=\ttfamily\small,
+	%	breaklines=true,
+	%	frame=single,
+	%	rulecolor=\color{black!30}
+	%}
+\graphicspath{
+	{../img/}
+	%   {../img_ipynb/}
+	%	{../img/H1/}
+	%	{../../results/DayResult/}
+}
+\DeclareGraphicsExtensions{.pdf,.jpeg,.png,.jpg}
+
+\hypersetup{
+	colorlinks=true,
+	linkcolor=blue,
+	citecolor=blue,
+	urlcolor=blue
+}
+
+\addbibresource{../ref/references.bib}
+\title{XXX}
+\author{Max Raxy}
+\affiliation{Udacity Institute of AI \& Technology}
+\course{Capstone-7: Integrative Industry Synthesis}
+\professor{~}
+\duedate{\today}
+
+\begin{document}
+	\maketitle
+	\tableofcontents
+	\newpage
+	\listoffigures%\thispagestyle{fancy}
+	\listoftables%\thispagestyle{fancy}
+	\newpage
+
+
+
+% Industry Context and Problem Definition
+% Overview of the Integrated Solution
+% Integration of Prior Projects and Methods
+% Technical Design Decisions and Tradeoffs
+% Ethical, Governance, and Responsible AI Considerations
+% Limitations and Risks
+% Professional and Industry Relevance
+% Future Extensions or Improvements
+% References
+
+\section{Notes}
+\parencite{creditcardfraud}
+
+\section{Overview and Industry Context}
+Describe the industry problem and why it matters.
+
+\section{Integration Rationale}
+Explain why the selected AI methods were combined and how prior projects informed your design.
+
+\section{System Design and Technical Decisions}
+Describe the system architecture, workflows, and key technical choices (Technical Design Decisions and Tradeoffs)
+
+\section{Ethical Considerations and Responsible AI}
+Analyze ethical risks, bias, transparency, accountability, and safeguards specific to the industry and system.
+
+\section{Evaluation and Reflection}
+Discuss what worked, what did not, and what you learned from integrating across domains.(Limitations and Risks)
+
+\section{Professional Relevance}
+Explain how this work demonstrates readiness for real-world AI roles.(Professional and Industry Relevance)
+
+\section{Future Extensions or Improvements}
+
+\section{References-x}
+Include all cited sources using a consistent citation style.
+Citations are required when referencing technical concepts, ethical frameworks, or best practices. Do not cite your own results or artifacts.
+
+% apa does not include ref and appx in TOC we forced it
+\phantomsection % Ensures hyperref links to the correct page
+\addcontentsline{toc}{section}{References}
+\printbibliography %[heading=none] % Removes default unnumbered header so it doesn't double-up
+
+ %Appendices start here (AFTER references)
+%\appendix
+%\phantomsection
+%\addcontentsline{toc}{section}{Appendix A: Asset and Test-case Info}
+%\section{Appendix A: Asset and Test-case Info}\label{app:a}
+%\newpage
+
+%\phantomsection
+%\addcontentsline{toc}{section}{Appendix B: XXX}
+%\section{Appendix B: XXX}
+%Content of Appendix B...
+\end{document}
