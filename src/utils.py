@@ -810,8 +810,14 @@ def find_optimal_triage_thresholds(clf, df, th_list_log,
                 fp_auto = np.sum((y_true == 0) & auto_block) * c_fp
 
                 n_escalated = np.sum(escalated)
+                # Unresolved fraud slipping past the LLM Agent, and asumed agent_recall = agent_accuracy
                 agent_fn = np.sum((y_true == 1) & escalated) * (1 - agent_accuracy) * c_fn
+
+                # Legitimate users wrongly blocked by the LLM Agent, and assumed agent_precision = agent_accuracy
                 agent_fp = np.sum((y_true == 0) & escalated) * (1 - agent_accuracy) * c_fp
+
+                #[NOTE] cost_agent_errors =  agent_fn + agent_fp;
+                # and cost_agent_total = (n_escalated * c_agent) + cost_agent_errors
 
                 total_cost = fn_auto + fp_auto + (n_escalated * c_agent) + agent_fn + agent_fp
 
