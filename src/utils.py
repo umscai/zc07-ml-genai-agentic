@@ -38,6 +38,8 @@ from sklearn.metrics import (
 import joblib
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
+from tqdm.auto import tqdm  # Auto-adapts to Notebook or Terminal environment
+from matplotlib.colors import LogNorm
 import logging
 logger = logging.getLogger(__name__)
 
@@ -334,6 +336,7 @@ def show_confusion_matrix(y_true:ArrayLike, y_pred: ArrayLike, xtick:List[str], 
         logger.error(f"Error in show_confusion_matrix: {e}")
         raise
 
+#----------------------------------------------------------------------------------------
 def get_model_scores(X: pd.DataFrame, y:pd.Series, model_name:str, model: Any, threshold:Optional[float]=None) -> Dict[str,Any]:
     """
     return all required scores in dict format (metric, value), also include model-name in dict
@@ -392,7 +395,7 @@ def get_model_scores(X: pd.DataFrame, y:pd.Series, model_name:str, model: Any, t
         logger.error(f"Error in get_model_scores: {e}")
         raise
 
-
+#----------------------------------------------------------------------------------------
 def show_model_auc_comparisons(model_name1:str, model1:Any, model_name2:str, model2:Any, X_test:pd.DataFrame, y_test:pd.Series):
     """
     Plots side-by-side ROC and Precision-Recall curves for two models using X_test and y_test.
@@ -447,6 +450,7 @@ def show_model_auc_comparisons(model_name1:str, model1:Any, model_name2:str, mod
         logger.error(f"Error in show_model_auc_comparisons: {e}")
         raise
 
+#----------------------------------------------------------------------------------------
 def get_xgb_resolved_params(clf:XGBClassifier)->Dict:
     """
     Get main parameter of fitted XGBClassifier
@@ -482,7 +486,7 @@ def get_xgb_resolved_params(clf:XGBClassifier)->Dict:
         logger.error(f"Error in show_model_auc_comparisons: {e}")
         raise
 
-
+#----------------------------------------------------------------------------------------
 def train_eval(X_train:pd.DataFrame, y_train:pd.Series,
                X_test:pd.DataFrame, y_test:pd.Series,
                tag:str, metrics:List)->Tuple[XGBClassifier, List]:
@@ -529,7 +533,7 @@ def train_eval(X_train:pd.DataFrame, y_train:pd.Series,
         logger.error(f"Error in train_eval: {e}")
         raise
 
-
+#----------------------------------------------------------------------------------------
 def plot_2d_visualization_for_binary_class_using_tsne(df: pd.DataFrame, max_class_samples:int=5000, ext_ax:Optional[Axes] = None):
     """
     Using t-SNE to visualize a binary class in 2D map, limit max number of samples per class due to heavy processing
@@ -599,7 +603,7 @@ def plot_2d_visualization_for_binary_class_using_tsne(df: pd.DataFrame, max_clas
         logger.error(f"Error in plot_2d_visualization_for_binary_class_using_tsne: {e}")
         raise
 
-
+#----------------------------------------------------------------------------------------
 def compare_two_metrics(df_metrics: pd.DataFrame, metric1:str, metric2:str, at_best_thr:bool, colors:Optional[List[str]]=None, ext_ax:Optional[Axes] = None):
     """
     Compare Two givem metrics based on the data in df_metrics, in a bar-plot
@@ -658,7 +662,7 @@ def compare_two_metrics(df_metrics: pd.DataFrame, metric1:str, metric2:str, at_b
         logger.error(f"Error in compare_two_metrics: {e}")
         raise
 
-
+#----------------------------------------------------------------------------------------
 def show_all_model_auc_comparisons(model_dic:Dict[str, Any], X_test:pd.DataFrame, y_test:pd.Series, models_name_in_order:Optional[List[str]]=None):
     """
     Plots side-by-side ROC and Precision-Recall curves for All models in model_dic using X_test and y_test.
@@ -713,4 +717,183 @@ def show_all_model_auc_comparisons(model_dic:Dict[str, Any], X_test:pd.DataFrame
         logger.error(f"Error in show_model_auc_comparisons: {e}")
         raise
 
+#----------------------------------------------------------------------------------------
+def get_optimal_thr(clf:XGBClassifier, df:pd.DataFrame, tag:str, th_list_log:ArrayLike=np.linspace(-5,-0.01,200))->Tuple[pd.DataFrame, float, List]:
+    """
+    A helper function to calculate optimal threshold for maximizing F2-Score
+    and providing data for plotting all metrics
+    Args:
+        - clf: classifier model
+        - df: dataframe contains data for test with target column called 'Class'
+        - tag: name for tracking
+        - th_list_log: list of threshold for test in log10 format
+    Returns:
+        dataframe for plotting, optimal-threshold, and list of metrics for few selected thresold
+    """
+    try:
+        y_test= df['Class']
+        X_test = df.drop(columns=['Class'])
+        #th_list_log=np.linspace(-5,-0.01,200)
+        th_list=np.power(10,th_list_log)
+        metrics=[]
+        for th in tqdm(th_list,'Thr'):
+            metrics.append(get_model_scores(X_test, y_test, 'Test', clf, th))
+        metrics_df=pd.DataFrame(metrics)
+        idx_max = metrics_df['F2-Score'].idxmax()
+        thx=metrics_df.loc[idx_max,'Threshold']
+        metrics_df['Threshold_log10']=np.log10(metrics_df['Threshold'])
+        metrics_df=metrics_df.drop(columns=['Model', 'Threshold'])
+        metrics2=[]
+        for th in [thx,0.1, 0.15, 0.5, 0.85]: # selected thresholds !
+            metrics2.append(get_model_scores(X_test, y_test, tag, clf, th))
+        print(f'Maximizing F2-Score: Optimal Threshold= {thx:.4f} (log10= {np.log10(thx):.3f})')
+        return metrics_df, thx, metrics2
+    except Exception as e:
+        logger.error(f"Error in get_optimal_thr: {e}")
+        raise
 
+#----------------------------------------------------------------------------------------
+def find_optimal_triage_thresholds(clf, df, th_list_log,
+                                     c_fn=10.0,
+                                     c_fp=5.0,
+                                     c_agent=0.2,
+                                     agent_accuracy=0.90)->Tuple[float, float, pd.DataFrame, ArrayLike, ArrayLike, ArrayLike]:
+    """
+    A helper function to calculate optimal dual threshold for triage stage in agentic workflow
+    and providing data for plotting cost contour to visualize 2D optimization
+    Args:
+        - clf: classifier model
+        - df: dataframe contains data for test with target column called 'Class'
+        - th_list_log: list of threshold for test in log10 format
+        - c_tn: Cost of False Negative
+        - c_fp: Cost of False Positive
+        - c_agent: Cost of not-auto-detect (passing to LLM-agent)
+        - agent_accuracy: implied cost of LLM-agent decision
+    Returns:
+        optimal thresholds, result dataframe, and meshgrid data for contour plot
+    Raises:
+        Exception: Re-raises any exception caught during processing after logging.
+    """
+    try:
+        y_true = df['Class'].values
+        X_test = df.drop(columns=['Class'])
+        y_probs = clf.predict_proba(X_test)[:, 1]
+
+        thresholds = np.power(10, th_list_log)
+        n_th = len(thresholds)
+
+        # Tau_Low along X-axis (columns), Tau_High along Y-axis (rows)
+        # In NumPy meshgrids generated by `np.meshgrid(x, y)`:
+        #* Row index `i` maps to the **Y-axis** (`Tau_High`).
+        #* Column index `j` maps to the **X-axis** (`Tau_Low`).
+        Tau_Low_Log, Tau_High_Log = np.meshgrid(th_list_log, th_list_log)
+        cost_surface = np.full((n_th, n_th), np.nan)
+
+        best_cost = float('inf')
+        best_tau_low, best_tau_high = None, None
+        results = []
+
+        # i = index for Tau_Low (X-axis), j = index for Tau_High (Y-axis)
+        for i in tqdm(range(n_th), desc='Searching Log Thresholds'):
+            tau_low = thresholds[i]
+
+            for j in range(i + 1, n_th):
+                tau_high = thresholds[j]
+
+                # Categorize predictions
+                auto_approve = y_probs < tau_low
+                auto_block = y_probs > tau_high
+                escalated = (y_probs >= tau_low) & (y_probs <= tau_high)
+
+                # Costs
+                fn_auto = np.sum((y_true == 1) & auto_approve) * c_fn
+                fp_auto = np.sum((y_true == 0) & auto_block) * c_fp
+
+                n_escalated = np.sum(escalated)
+                agent_fn = np.sum((y_true == 1) & escalated) * (1 - agent_accuracy) * c_fn
+                agent_fp = np.sum((y_true == 0) & escalated) * (1 - agent_accuracy) * c_fp
+
+                total_cost = fn_auto + fp_auto + (n_escalated * c_agent) + agent_fn + agent_fp
+
+                # [NOTE]: Matrix row index is j (Y-axis), column index is i (X-axis)
+                cost_surface[j, i] = total_cost
+
+                if total_cost < best_cost:
+                    best_cost = total_cost
+                    best_tau_low = tau_low
+                    best_tau_high = tau_high
+
+                results.append({
+                    'tau_low': tau_low,
+                    'tau_high': tau_high,
+                    'log_tau_low': th_list_log[i],
+                    'log_tau_high': th_list_log[j],
+                    'automation_rate': (np.sum(auto_approve) + np.sum(auto_block)) / len(y_true),
+                    'agent_load': n_escalated / len(y_true),
+                    'total_cost': total_cost
+                })
+
+        return best_tau_low, best_tau_high, pd.DataFrame(results), Tau_Low_Log, Tau_High_Log, cost_surface
+    except Exception as e:
+        logger.error(f'Error in find_optimal_triage_thresholds: {e}')
+        raise
+
+def plot_optimal_triage_thresholds_contour(best_tau_low: float, best_tau_high:float, Tau_Low_Log:ArrayLike, Tau_High_Log:ArrayLike, cost_surface:ArrayLike):
+    """
+    plot 2D visualization of cost optimization in dual threshold using Contour plot
+    Args:
+        - best_tau_low: optimal threshold low
+        - best_tau_high: optimal threshold high
+        - Tau_Low_Log: X for Contour plot
+        - Tau_High_Log: Y for Contour plot
+        - cost_surface: Z for Contour plot
+    Returns:
+        None
+    Raises:
+        Exception: Re-raises any exception caught during processing after logging.
+    """
+    try:
+        # Plot setup
+        fig, ax = plt.subplots(figsize=(9, 7))
+
+        # Logarithmic contour levels prevent high-cost spikes from starving the rest of the plot
+        min_val = np.nanmin(cost_surface)
+        max_val = np.nanmax(cost_surface)
+        levels = np.logspace(np.log10(min_val), np.log10(max_val), 20)
+
+        # Filled contour background
+        #logarithmic contour levels or LogNorm()
+        cf = ax.contourf(Tau_Low_Log, Tau_High_Log, cost_surface, levels=levels, norm=LogNorm(), cmap="viridis_r")
+        cbar = fig.colorbar(cf, ax=ax)
+        cbar.set_label("Total Cost (Log Scale)", rotation=270, labelpad=15)
+
+        # Contour line overlays with labels
+        CS = ax.contour(Tau_Low_Log, Tau_High_Log, cost_surface, levels=levels, norm=LogNorm(), colors="black", alpha=0.7, linewidths=0.5)
+        ax.clabel(CS, fontsize=8, fmt="%1.0f")
+
+        # Plot optimal point using log coordinates matching the plot axes
+        opt_log_low = np.log10(best_tau_low)
+        opt_log_high = np.log10(best_tau_high)
+
+
+        # add value and log-value of optimal thresholds low and high on the plot
+        ax.plot(opt_log_low, opt_log_high, 'r*', markersize=15,
+                label=f"Optimal: τ_low={best_tau_low:.3f} (log10: {opt_log_low:.3f}")
+
+        ax.plot(opt_log_low, opt_log_high, 'r*', markersize=15,
+                label=f"Optimal: τ_high={best_tau_high:.3f} (log10: {opt_log_high:.3f}")
+
+
+        # Diagonal boundary line (tau_low == tau_high in log-space)
+        ax.plot([Tau_Low_Log.min(), 0], [Tau_High_Log.min(), 0], 'k--', alpha=0.5, label="Boundary (τ_low = τ_high)")
+
+        ax.set_title("Triage Threshold Log-Space Cost Surface", fontsize=13, fontweight="bold")
+        ax.set_xlabel("log10(τ_low) → Auto-Approve Threshold", fontsize=11)
+        ax.set_ylabel("log10(τ_high) → Auto-Block Threshold", fontsize=11)
+        ax.legend(loc="lower right")
+        ax.grid(True, linestyle="--", alpha=0.4)
+
+        plt.tight_layout()
+    except Exception as e:
+        logger.error(f'Error in plot_optimal_triage_thresholds_contour: {e}')
+        raise
