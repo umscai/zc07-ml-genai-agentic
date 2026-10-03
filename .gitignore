@@ -16,6 +16,10 @@ report/latex/tex/report.*
 #except the real source
 !report/latex/tex/report.tex
 
+report/latex/tex/presentation.*
+#except the real source
+!report/latex/tex/presentation.tex
+
 catboost_info/
 metadata.json
 
