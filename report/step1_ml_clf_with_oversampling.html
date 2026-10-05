@@ -7802,12 +7802,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="Integrative-Industry-Synthesis:-ML,-GenAI,-and-Agentic">Integrative Industry Synthesis: ML, GenAI, and Agentic<a class="anchor-link" href="#Integrative-Industry-Synthesis:-ML,-GenAI,-and-Agentic">¶</a></h1><ul>
-<li>Student: Max Raxy</li>
-<li>Dataset: (<a href="https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud">https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud</a>)</li>
-</ul>
-<hr/>
-<p>The goal for this project is to combine the idea of the following previous projects:</p>
+<h1 id="Integrative-Industry-Synthesis:-ML,-GenAI,-and-Agentic">Integrative Industry Synthesis: ML, GenAI, and Agentic<a class="anchor-link" href="#Integrative-Industry-Synthesis:-ML,-GenAI,-and-Agentic">¶</a></h1><h2 id="Project-Overview">Project Overview<a class="anchor-link" href="#Project-Overview">¶</a></h2><p>The goal for this project is to combine the idea of the following previous projects:</p>
 <ol>
 <li><strong>Capstone-3</strong>: Applied Machine Learning (Credit Card Fraud Detection)</li>
 <li><strong>Capstone-5</strong>: Generative AI Applications (Anime Face Generation with Variational Auto-Encoder(<strong>VAE</strong>) from scratch)</li>
@@ -7823,6 +7818,14 @@ a.anchor-link {
 <li>Use the classifier-model as anomaly detector in agentic workflow (In <strong>Capstone-6</strong> we use simple statistical logic for anomaly detection, not a ML-model)</li>
 <li>Combine our <strong>ML-model</strong>, <strong>GenAI-model</strong>, and <strong>Agentic-Workflow</strong> into a Credit Card Fraud detection with response (agentic workflow)</li>
 </ol>
+<hr/>
+<h2 id="In-this-notebook-(Step-1)">In this notebook (Step-1)<a class="anchor-link" href="#In-this-notebook-(Step-1)">¶</a></h2><ul>
+<li>We will train our ML classifier model for fraud detection</li>
+<li>We use XGBoost with and without oversampling</li>
+<li>When we use oversampling of minority (fraud) class, we check: <strong>SMOTE</strong>, and Generative models <strong>TVAE/CTGAN</strong></li>
+<li>Without oversampling, we use <strong>cost-sensitive learning</strong> that used in Capstone-3.</li>
+<li>Dataset: (<a href="https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud">https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud</a>)</li>
+</ul>
 <hr/>
 <p><strong>Note</strong>: The dataset contains transactions made by credit cards in September 2013 by European cardholders. However due to the confidentiality/privacy issue, all features are the result of PCA, except the <code>Time</code> and <code>Amount</code>. The dataset is highly unbalanced, the positive class (frauds) account for 0.172% of all transactions; which make the classification challenging and interesting.</p>
 <ul>
@@ -7884,7 +7887,7 @@ a.anchor-link {
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>notebook_start_time=Thu Oct  1 09:46:21 2026
+<pre>notebook_start_time=Mon Oct  5 07:30:00 2026
 </pre>
 </div>
 </div>
@@ -12193,7 +12196,7 @@ XGB_CTGAN-Model saved at /home/max/x/zc07-ml-genai-agentic/data/ml_models/XGB_CT
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Total Notebook Execution Time: 2 minutes and 18.49 seconds
+<pre>Total Notebook Execution Time: 2 minutes and 17.30 seconds
 </pre>
 </div>
 </div>

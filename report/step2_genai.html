@@ -7802,10 +7802,16 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="Integrative-Industry-Synthesis:-ML,-GenAI,-and-Agentic">Integrative Industry Synthesis: ML, GenAI, and Agentic<a class="anchor-link" href="#Integrative-Industry-Synthesis:-ML,-GenAI,-and-Agentic">¶</a></h1><ul>
-<li>In this notebook we sill use <strong>SDV</strong> (Synthetic Data Vault) library, to train <strong>TVAE</strong> and <strong>CTGAN</strong></li>
+<h1 id="Integrative-Industry-Synthesis:-ML,-GenAI,-and-Agentic">Integrative Industry Synthesis: ML, GenAI, and Agentic<a class="anchor-link" href="#Integrative-Industry-Synthesis:-ML,-GenAI,-and-Agentic">¶</a></h1><h2 id="In-this-notebook-(Step-2)">In this notebook (Step-2)<a class="anchor-link" href="#In-this-notebook-(Step-2)">¶</a></h2><ul>
+<li>we will use <strong>SDV</strong> (Synthetic Data Vault) library, to train two generative models:<strong>TVAE</strong> and <strong>CTGAN</strong></li>
 <li>We use full dataset (not just training data of minority class for oversampling)</li>
-<li>We try to create pure generative model</li>
+<li>We train separate models for minority and majority class. Overall four generative models:<ol>
+<li><strong>TVAE0</strong>: TVAE on class=0 (Majority: Legit)</li>
+<li><strong>TVAE1</strong>: TVAE on class=1 (Minority: Fraud)</li>
+<li><strong>CTGAN0</strong>: CTGAN on class=0 (Majority: Legit)</li>
+<li><strong>CTGAN1</strong>: CTGAN on class=1 (Minority: Fraud)</li>
+</ol>
+</li>
 <li><strong>SDV</strong> (Synthetic Data Vault: <a href="https://github.com/sdv-dev">https://github.com/sdv-dev</a>) also provides <strong>SDMetrics</strong>(Synthetic data evaluation metrics), which we are using for numerical evaluation of generative models</li>
 </ul>
 </div>
@@ -7861,7 +7867,7 @@ a.anchor-link {
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>notebook_start_time=Thu Oct  1 09:51:30 2026
+<pre>notebook_start_time=Mon Oct  5 07:33:48 2026
 </pre>
 </div>
 </div>
@@ -8837,8 +8843,8 @@ Non-Fraud duplicates: 3440
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
 <pre>Loading TVAE model for majority-Class from /home/max/x/zc07-ml-genai-agentic/data/ml_models/tvae_majority_model_F.pkl
-CPU times: user 43.3 ms, sys: 5.14 ms, total: 48.4 ms
-Wall time: 44.3 ms
+CPU times: user 78.4 ms, sys: 4.28 ms, total: 82.7 ms
+Wall time: 192 ms
 </pre>
 </div>
 </div>
@@ -8922,8 +8928,8 @@ Wall time: 44.3 ms
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
 <pre>Loading CTGAN model for majority-Class from /home/max/x/zc07-ml-genai-agentic/data/ml_models/ctgan_majority_model_F.pkl
-CPU times: user 39.5 ms, sys: 59 μs, total: 39.6 ms
-Wall time: 39.3 ms
+CPU times: user 36.3 ms, sys: 2.93 ms, total: 39.3 ms
+Wall time: 39.1 ms
 </pre>
 </div>
 </div>
@@ -10641,7 +10647,7 @@ y-train: 1600(80.00%), y-test: 400(20.00%)
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Total Notebook Execution Time: 7 minutes and 8.84 seconds
+<pre>Total Notebook Execution Time: 6 minutes and 59.70 seconds
 </pre>
 </div>
 </div>

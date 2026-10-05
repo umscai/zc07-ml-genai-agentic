@@ -35,6 +35,7 @@ from sklearn.metrics import (
     fbeta_score,
     make_scorer,
 )
+import pprint
 import joblib
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
@@ -844,7 +845,8 @@ def find_optimal_triage_thresholds(clf, df, th_list_log,
         logger.error(f'Error in find_optimal_triage_thresholds: {e}')
         raise
 
-def plot_optimal_triage_thresholds_contour(best_tau_low: float, best_tau_high:float, Tau_Low_Log:ArrayLike, Tau_High_Log:ArrayLike, cost_surface:ArrayLike):
+#----------------------------------------------------------------------------------------
+def plot_optimal_triage_thresholds_contour(best_tau_low: float, best_tau_high:float, Tau_Low_Log:ArrayLike, Tau_High_Log:ArrayLike, cost_surface:ArrayLike,title_ext:str=''):
     """
     plot 2D visualization of cost optimization in dual threshold using Contour plot
     Args:
@@ -853,6 +855,7 @@ def plot_optimal_triage_thresholds_contour(best_tau_low: float, best_tau_high:fl
         - Tau_Low_Log: X for Contour plot
         - Tau_High_Log: Y for Contour plot
         - cost_surface: Z for Contour plot
+        - title_ext: extension for contour plot title
     Returns:
         None
     Raises:
@@ -893,7 +896,7 @@ def plot_optimal_triage_thresholds_contour(best_tau_low: float, best_tau_high:fl
         # Diagonal boundary line (tau_low == tau_high in log-space)
         ax.plot([Tau_Low_Log.min(), 0], [Tau_High_Log.min(), 0], 'k--', alpha=0.5, label="Boundary (τ_low = τ_high)")
 
-        ax.set_title("Triage Threshold Log-Space Cost Surface", fontsize=13, fontweight="bold")
+        ax.set_title(f"Triage Dual-Threshold Contour plot ({title_ext})", fontsize=13, fontweight="bold")
         ax.set_xlabel("log10(τ_low) → Auto-Approve Threshold", fontsize=11)
         ax.set_ylabel("log10(τ_high) → Auto-Block Threshold", fontsize=11)
         ax.legend(loc="lower right")
@@ -902,4 +905,178 @@ def plot_optimal_triage_thresholds_contour(best_tau_low: float, best_tau_high:fl
         plt.tight_layout()
     except Exception as e:
         logger.error(f'Error in plot_optimal_triage_thresholds_contour: {e}')
+        raise
+
+#----------------------------------------------------------------------------------------
+def get_labeled_dataset_for_ltm_db(clf, df, th_low, th_high, tag)->tuple[pd.DataFrame, dict]:
+    """
+    A helper function to label rows in dataset (df) by dual thresolds for LTM database prepration
+    Args:
+        - clf: classifier model
+        - df: dataframe contains data with target column 'Class'
+        - th_low: low-threshold
+        - th_high: high_threshold
+        - tag: tag for name and trackiing
+    Returns:
+        labeled dataframe (TN no needed for LTM, only 100 TN rows kept in output as sample), and info dict
+    Raises:
+        Exception: Re-raises any exception caught during processing after logging.
+    """
+    try:
+        csv_name = f'labeled_dataset_from_{tag}.csv'
+        info_name = f'labeled_dataset_from_{tag}_info.pkl'
+        csv_path = settings.DATA_DIR/csv_name
+        info_path = settings.DATA_DIR/info_name
+        if csv_path.exists():
+            print(f'Load existing labeled datast from:{csv_path}')
+            dff = pd.read_csv(csv_path)
+            info_dic = joblib.load(info_path)
+            return dff, info_dic
+
+        dff = df.copy()
+        y_test = dff['Class']
+        X_test = dff.drop(columns=['Class'])
+        y_probs = clf.predict_proba(X_test)[:, 1]
+
+        # Define vectorized conditions
+        cond1 = (y_probs < th_low) & (y_test == 0)
+        cond2 = (y_probs > th_high) & (y_test == 1)
+        cond3 = (y_probs > th_high) & (y_test == 0)
+        cond4 = (y_probs < th_low) & (y_test == 1)
+        cond5 = (y_probs >= th_low) & (y_probs <= th_high) & (y_test == 0)
+        cond6 = (y_probs >= th_low) & (y_probs <= th_high) & (y_test == 1)
+
+        # Define label and node maps corresponding to conditions
+        labels = [
+            'TRUE_NEGATIVE',
+            'TRUE_POSITIVE',
+            'FALSE_POSITIVE',
+            'FALSE_NEGATIVE',
+            'TRUE_NEGATIVE',
+            'TRUE_POSITIVE',
+        ]
+
+        nodes = [
+            'Detector',
+            'Detector',
+            'Detector',
+            'Detector',
+            'LLM_Agent',
+            'LLM_Agent',
+        ]
+
+        # Assign values using numpy select
+        dff['label'] = np.select(
+            [cond1, cond2, cond3, cond4, cond5, cond6], labels, default='UNLABELED'
+        )
+        dff['node'] = np.select(
+            [cond1, cond2, cond3, cond4, cond5, cond6], nodes, default='UNLABELED'
+        )
+
+        # Print row counts for each condition
+        TN1 = cond1.sum().item()
+        TP1 = cond2.sum().item()
+        FP = cond3.sum().item()
+        FN = cond4.sum().item()
+        TN2 = cond5.sum().item()
+        TP2 = cond6.sum().item()
+        TN=TN1+TN2
+        TP=TP1+TP2
+        accuracy =(TP+TN)/(TP+TN+FP+FN)
+        precision = TP/(TP+FP)
+        recall = TP/(TP+FN)
+        f1= 2 * precision*recall/(precision+recall)
+        f2= 5 * precision*recall/(4*precision+recall)
+        info_dic={
+            'TN1': TN1, # By Detector Node
+            'TP1': TP1, # By Detector Node
+            'FP': FP, # By Detector Node
+            'FN': FN, # By Detector Node
+            'TN2': TN2, # By LLM-Agent Node
+            'TP2': TP2, # By LLM-Agent Node
+            'TN': TN,
+            'TP': TP,
+            'accuracy': accuracy,
+            'precision': precision,
+            'recall': recall,
+            'f1_score': f1,
+            'f2_score': f2,
+            'conf_mat': [[TN, FP], [FN, TP]]
+        }
+        #pprint.pprint(info_dic)
+        joblib.dump(info_dic, info_path)
+        # print(f'1. (probs < th_low) & (Class == 0) [Detector TN]: {cond1.sum()}')
+        # print(f'2. (probs > th_high) & (Class == 1) [Detector TP]: {cond2.sum()}')
+        # print(f'3. (probs > th_high) & (Class == 0) [Detector FP]: {cond3.sum()}')
+        # print(f'4. (probs < th_low) & (Class == 1) [Detector FN]: {cond4.sum()}')
+        # print(f'5. (th_low <= probs <= th_high) & (Class == 0) [LLM TN]: {cond5.sum()}')
+        # print(f'6. (th_low <= probs <= th_high) & (Class == 1) [LLM TP]: {cond6.sum()}')
+        # print(f'Accuracy: {accuracy:.4%}')
+        # print(f'precision: {precision:.4%}')
+        # print(f'recall: {recall:.4%}')
+        # print(f'F1-Score: {f1:.4%}')
+        # print(f'F2-Score: {f2:.4%}')
+
+        if TP+TN+FP+FN != len(dff):
+            raise ValueError(f'TP+TN+FP+FN , df-len mismatch')
+
+        # Step 7: For rows with label="TRUE_NEGATIVE" and node="Detector", keep at most 100 random rows
+        detector_tn_mask = (dff['label'] == 'TRUE_NEGATIVE') & (
+            dff['node'] == 'Detector'
+        )
+        detector_tn_indices = dff[detector_tn_mask].index
+
+        if len(detector_tn_indices) > 100:
+            # Randomly select indices to drop
+            drop_indices = np.random.choice(
+                detector_tn_indices,
+                size=len(detector_tn_indices) - 100,
+                replace=False,
+            )
+            dff = dff.drop(index=drop_indices)
+            dff = dff.reset_index(drop=True).copy()
+            dff.to_csv(csv_path, index = False)
+
+        return dff, info_dic
+    except Exception as e:
+        logger.error(f'Error in get_labeled_dataset_for_ltm_db: {e}')
+        raise
+
+
+def plot_confusion_matrix(clf, df, thr, tag, sns_cmap, ext_ax, cm=None, dual_thr=None):
+    """
+    A helper function to plot Confusion Matrix and return y_true and y_pred
+    Args:
+        - clf: classifier model
+        - df: dataframe contains data for test with target column called 'Class'
+        - thr: thresold use in prediction probability of class-1
+        - tag: name for tracking
+        - sns_cmap: map used for plotting
+        - ext_ax: axis for plot
+        - cm: confusion matrix, used fro dual threshold case
+        - dual_thr: used for title of dual threshold case
+    Returns:
+        y_true and y_pred
+    """
+    try:
+        if cm is None:
+            y_test= df['Class']
+            X_test = df.drop(columns=['Class'])
+            y_probs = clf.predict_proba(X_test)[:, 1]
+            y_pred = (y_probs >= thr).astype(int)
+            cm = confusion_matrix(y_test, y_pred)
+        #print(cm.shape)
+        cm_xytick=['Not-Fraud', 'Fraud'] # Confusion matrix xy tick label
+        sns.heatmap(cm, annot=True, fmt='d', cmap=sns_cmap, xticklabels=cm_xytick, yticklabels=cm_xytick, ax=ext_ax, annot_kws={'size': 16})
+        if dual_thr is None:
+            title = f'{tag}: Confusion Matrix (Thr: {thr:.3f})'
+        else:
+            thr1=dual_thr['tau_low']
+            thr2=dual_thr['tau_high']
+            title = f"{tag}: Confusion Matrix (Thrs: ({thr1:.3f},{thr2:.3f}))"
+        ext_ax.set_title(title, fontsize=11)
+        ext_ax.set_xlabel('Predicted Label', fontsize=12)
+        ext_ax.set_ylabel('True Label', fontsize=12)
+    except Exception as e:
+        logger.error(f'Error in plot_confusion_matrix: {e}')
         raise
