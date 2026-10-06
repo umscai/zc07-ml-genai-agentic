@@ -11,6 +11,7 @@ import sys
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
 import argparse
+import joblib
 
 PROJECT_ROOT_PATH = Path(__file__).resolve().parents[1]
 ENV_PATH = PROJECT_ROOT_PATH / ".env" # very critical, otherwise work in jupyter but not in script
@@ -25,6 +26,7 @@ class Settings(BaseSettings):
     DATASET_FILE_CLEANED:str = "cleaned_creditcard.csv"
     DATASET_FILE_CLEANED_TRAINING:str = "cleaned_creditcard_training.csv"
     DATASET_FILE_CLEANED_TEST:str = "cleaned_creditcard_test.csv"
+    DATASET_FILE_CLEANED_SAMPLE:str = "cleaned_dataset_sample.csv"
 
 
     RANDOM_SEED:int = 6488
@@ -37,11 +39,18 @@ class Settings(BaseSettings):
     USE_CONTEXT:bool #will load USE_CONTEXT from .env and convert to boolean
     #
     TRANSACTION_DB:str = 'transaction.db'
-    LTM_DB:str = 'ltm.db'
+    LTM_DB:str = 'ltm.db' # Chroma Vector dB
     CHECKPOINT_DB:str = 'checkpoint_db'
     WORKFLOW_GRAPH: str = 'workflow_graph.png'
+    COLLECTION_NAME:str = "fraud_30d_direct" # Collection name in Chroma Vector dB
     #
     HOURS_IN_TIME_GROUP:int = 2 # after converting time to Hours in [0,23], we group them together [0,1]->0, [2,3]-> 1,...
+
+    # when pkl file exist these value will be updated by values in pkl file
+    LOW_THR: float = 0.026759
+    HIGH_THR: float = 0.870154
+    AMOUNT_MEAN: float = 89.3
+    AMOUNT_STD: float = 251.4
 
 
     # --- 2. COMPUTED FIELDS --------------------------------------------------
@@ -83,6 +92,11 @@ class Settings(BaseSettings):
     @property
     def LTM_DIR(self) -> Path:
         return self.OUT_DIR / "db_ltm"
+
+    @property
+    def CHROMA_DIR(self) -> Path:
+        """Alias for LTM_DIR."""
+        return self.LTM_DIR
 
     @computed_field
     @property
@@ -133,11 +147,26 @@ class Settings(BaseSettings):
             if not db_path.exists():
                 print(f"WARNING : Missing database: {db_name} at {db_path}")
 
+
+    def update_settings_from_pkl_file(self):
+        amount_stat_path = self.DATA_DIR/'amount_mean_std.pkl'
+        if amount_stat_path.exists():
+            #print('Load and update amount-stat')
+            stat = joblib.load(amount_stat_path)
+            self.AMOUNT_MEAN = stat.get('mean', 89.3)
+            self.AMOUNT_STD = stat.get('std', 251.4)
+        dual_thr_path = self.DATA_DIR/'dual_thresholds.pkl'
+        if dual_thr_path.exists():
+            #print('load and update dual thr')
+            thr = joblib.load(dual_thr_path)
+            self.LOW_THR = thr.get('tau_low', 0.02676)
+            self.HIGH_THR = thr.get('tau_high', 0.87015)
 #------------------------------------------------------------------------------
 # Create a single instance to be used everywhere
 settings = Settings()
 settings.create_directories()
 #settings.check_all_db_exist()
+settings.update_settings_from_pkl_file()
 
 
 #------------------------------------------------------------------------------

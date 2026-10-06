@@ -928,7 +928,7 @@ def get_labeled_dataset_for_ltm_db(clf, df, th_low, th_high, tag)->tuple[pd.Data
         csv_path = settings.DATA_DIR/csv_name
         info_path = settings.DATA_DIR/info_name
         if csv_path.exists():
-            print(f'Load existing labeled datast from:{csv_path}')
+            print(f'Load existing labeled dataset from:{csv_path}')
             dff = pd.read_csv(csv_path)
             info_dic = joblib.load(info_path)
             return dff, info_dic
@@ -937,6 +937,7 @@ def get_labeled_dataset_for_ltm_db(clf, df, th_low, th_high, tag)->tuple[pd.Data
         y_test = dff['Class']
         X_test = dff.drop(columns=['Class'])
         y_probs = clf.predict_proba(X_test)[:, 1]
+        dff['fraud_prob'] = y_probs
 
         # Define vectorized conditions
         cond1 = (y_probs < th_low) & (y_test == 0)
@@ -1043,7 +1044,7 @@ def get_labeled_dataset_for_ltm_db(clf, df, th_low, th_high, tag)->tuple[pd.Data
         raise
 
 
-def plot_confusion_matrix(clf, df, thr, tag, sns_cmap, ext_ax, cm=None, dual_thr=None):
+def plot_confusion_matrix(clf, df, thr, tag, sns_cmap, ext_ax, cm=None, dual_thr=None)->dict[str, float|str]:
     """
     A helper function to plot Confusion Matrix and return y_true and y_pred
     Args:
@@ -1056,7 +1057,7 @@ def plot_confusion_matrix(clf, df, thr, tag, sns_cmap, ext_ax, cm=None, dual_thr
         - cm: confusion matrix, used fro dual threshold case
         - dual_thr: used for title of dual threshold case
     Returns:
-        y_true and y_pred
+        metric dict
     """
     try:
         if cm is None:
@@ -1065,18 +1066,48 @@ def plot_confusion_matrix(clf, df, thr, tag, sns_cmap, ext_ax, cm=None, dual_thr
             y_probs = clf.predict_proba(X_test)[:, 1]
             y_pred = (y_probs >= thr).astype(int)
             cm = confusion_matrix(y_test, y_pred)
+        else:
+            cm=np.array(cm)
         #print(cm.shape)
         cm_xytick=['Not-Fraud', 'Fraud'] # Confusion matrix xy tick label
         sns.heatmap(cm, annot=True, fmt='d', cmap=sns_cmap, xticklabels=cm_xytick, yticklabels=cm_xytick, ax=ext_ax, annot_kws={'size': 16})
         if dual_thr is None:
-            title = f'{tag}: Confusion Matrix (Thr: {thr:.3f})'
+            thx=f'{thr:.3f}'
+            title = f'{tag}: Confusion Matrix (Thr: {thx})'
+
         else:
             thr1=dual_thr['tau_low']
             thr2=dual_thr['tau_high']
-            title = f"{tag}: Confusion Matrix (Thrs: ({thr1:.3f},{thr2:.3f}))"
+            thx=f'({thr1:.3f},{thr2:.3f})'
+            title = f"{tag}: Confusion Matrix (Thrs: {thx})"
         ext_ax.set_title(title, fontsize=11)
         ext_ax.set_xlabel('Predicted Label', fontsize=12)
         ext_ax.set_ylabel('True Label', fontsize=12)
+        #---------------------------------------------------
+        # Unpack confusion matrix values (for binary classification)
+        tn, fp, fn, tp = cm.ravel()
+        # 1. Accuracy
+        accuracy = (tp + tn) / (tp + tn + fp + fn)
+        # 2. Precision
+        precision = tp / (tp + fp) if (tp + fp) > 0 else 0
+        # 3. Recall (Sensitivity / True Positive Rate)
+        recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+        # 4. F1-Score
+        f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+        # 5. F2-Score (beta=2 weighs recall higher than precision)
+        beta = 2
+        f2_score = (1 + beta**2) * (precision * recall) / ((beta**2 * precision) + recall) if (precision + recall) > 0 else 0
+
+        metric={
+            "Threshold": f'{tag}: {thx}',
+            "Accuracy":  accuracy,
+            "Precision": precision,
+            "Recall":    recall,
+            "F1-Score":  f1_score,
+            "F2-Score":  f2_score,
+        }
+        return metric
+
     except Exception as e:
         logger.error(f'Error in plot_confusion_matrix: {e}')
         raise
