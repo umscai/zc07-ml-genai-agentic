@@ -41,6 +41,15 @@ from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
 from tqdm.auto import tqdm  # Auto-adapts to Notebook or Terminal environment
 from matplotlib.colors import LogNorm
+
+#
+from sqlalchemy import create_engine, Engine, inspect
+#from sqlalchemy.orm import sessionmaker
+
+from sqlalchemy import create_engine, inspect
+from sqlalchemy.orm import Session, declarative_base
+from contextlib import contextmanager
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -1111,3 +1120,67 @@ def plot_confusion_matrix(clf, df, thr, tag, sns_cmap, ext_ax, cm=None, dual_thr
     except Exception as e:
         logger.error(f'Error in plot_confusion_matrix: {e}')
         raise
+
+#----------------------------------------------------------------------------------------
+@contextmanager
+def get_session(engine: Engine):
+    """Provide a transactional scope around a series of operations."""
+    with Session(engine) as session:
+        with session.begin(): # Automatically commits on success, rolls back on error
+            yield session
+        # Session is automatically closed here when exiting the outer 'with'
+
+#----------------------------------------------------------------------------------------
+def init_and_setup_db(db_path: Path, base_cls: declarative_base, force_reset:bool=False):
+    """
+    init and Create a new SQLite database at db_path using the provided Base metadata
+    reset before creating if force_reset=True
+    Args:
+        - db_path: path to dB
+        - base_cls: declarative_base of the dB model
+        - force_reset: if True, reset existing dB and then init/setup, otherwise no action is taken
+    Returns:
+        None
+    Raises:
+        Exception: Re-raises any exception caught during processing after logging.
+    """
+    try:
+        db_path = Path(db_path)
+        if db_path.exists():
+            if force_reset:
+                db_path.unlink()
+                print(f"Existing database at {db_path} removed.")
+            else:
+                print(f'database already exist at :{db_path} (no action is taken)')
+                return
+        else:
+            print(f'No database at {db_path}, Init and setup for the first time!')
+
+        # Ensure parent folder exists
+        db_path.parent.mkdir(parents=True, exist_ok=True)
+
+        engine = create_engine(f"sqlite:///{db_path.resolve()}")
+
+        # Pass the actual Base from the models module
+        base_cls.metadata.create_all(engine)
+        print("Database and tables created successfully.")
+
+        inspector = inspect(engine)
+        table_names = inspector.get_table_names()
+        print(f"Detected tables in {db_path}: {table_names}")
+    except Exception as e:
+        logger.error(f"Error in init_and_setup_db at {db_path} with force_reset={force_reset}: {e}")
+        raise
+
+#----------------------------------------------------------------------------------------
+def get_val(obj, key):
+    """
+    A helper function to extract out of type dict or pydantic model
+    Args:
+        obj: a dict or a pydantic model obj
+        key: the key in dict, or field in pydantic model
+    """
+    if obj is None: return None
+    if hasattr(obj, key): return getattr(obj, key)
+    if isinstance(obj, dict): return obj.get(key)
+    return None

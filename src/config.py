@@ -39,7 +39,8 @@ class Settings(BaseSettings):
     USE_CONTEXT:bool #will load USE_CONTEXT from .env and convert to boolean
     #
     TRANSACTION_DB:str = 'transaction.db'
-    LTM_DB:str = 'ltm.db' # Chroma Vector dB
+    LTM_DB:str = 'chroma.sqlite3' # Chroma Vector dB default name
+    CHROMA_DB:str = 'chroma.sqlite3' # Chroma Vector dB default name (alias for LTM)
     CHECKPOINT_DB:str = 'checkpoint_db'
     WORKFLOW_GRAPH: str = 'workflow_graph.png'
     COLLECTION_NAME:str = "fraud_30d_direct" # Collection name in Chroma Vector dB

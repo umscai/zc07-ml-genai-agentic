@@ -291,7 +291,7 @@ def init_ltm_db(force_reset:bool = False):
         Exception: Re-raises any exception caught during processing after logging.
     """
     try:
-        db_path = settings.CHROMA_DIR/'chroma.sqlite3'
+        db_path = settings.CHROMA_DIR/settings.CHROMA_DB #'chroma.sqlite3'
         if db_path.exists():
             if force_reset:
                 reset_vector_db_on_disk()
