@@ -20,7 +20,7 @@ def add_single_transaction_to_vector_db(
     fraud_prob: float,
     actual_class: Union[int, str],
     actual_label: str,
-    node: Literal["Detector", "LLM_Agent"],
+    node: Literal["Detector", "LLM_Agent","Human_Agent"],
     collection: Union[chromadb.Collection, None] = None,
 ) -> bool:
     """Transforms a single transaction DataFrame row and adds/upserts it into ChromaDB.

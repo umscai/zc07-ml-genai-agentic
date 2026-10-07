@@ -274,27 +274,28 @@ def get_args():
         default="jsonl",
         help="The storage format for the logs"
     )
-    # parser.add_argument(
-    #     "-a", "--asset",
-    #     type=int,
-    #     choices=[1, 2, 3],
-    #     default=1,
-    #     help="asset-id/index to get normal operational parameters,...(default: 1)"
-    # )
-    # parser.add_argument(
-    #     "-t", "--test",
-    #     type=int,
-    #     choices=[1, 2, 3,4],
-    #     default=1,
-    #     help="Test-Case number (default: 1)"
-    # )
+    parser.add_argument(
+        "-s", "--source",
+        type=str,
+        choices=['real', 'gen'],
+        default='gen',
+        help="source of samples: existing 'real' data, or new 'generated' samples(default: 'gen')"
+    )
+    parser.add_argument(
+        "-c", "--class_id",
+        type=int,
+        choices=[0, 1],
+        default=1,
+        help="class_id of sample: 0=Legit or 1=Fraud (default: 1)"
+    )
 
-    # parser.add_argument(
-    #     "-s", "--samples",
-    #     type=int,
-    #     default=1,
-    #     help="Number of telemetry samples to generate and inject to system(default: 1)"
-    # )
+    parser.add_argument(
+        "-n", "--num",
+        type=int,
+        choices=range(1, 11), # limit the range to avoid LLM-cost
+        default=1,
+        help="Number of transaction-sample (batch) to generate and inject to system(default: 1)"
+    )
 
 
     return parser.parse_args()

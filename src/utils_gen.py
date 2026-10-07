@@ -155,7 +155,14 @@ def get_metadata_for_synthesizer(sdv_input:pd.DataFrame, class_label:Literal[0,1
         raise
 
 #----------------------------------------------------------------------------------------
-def get_model_for_synthesizer(train_df:pd.DataFrame, class_label:Literal[0,1], synthesizer:Literal['tvae','ctgan'], ext:str='', n_epochs:Optional[int]=None)->TVAESynthesizer | CTGANSynthesizer:
+def get_model_for_synthesizer(
+        train_df:pd.DataFrame,
+        class_label:Literal[0,1],
+        synthesizer:Literal['tvae','ctgan'],
+        ext:str='',
+        n_epochs:Optional[int]=None,
+        prn:bool=True
+    )->TVAESynthesizer | CTGANSynthesizer:
     """
     load existing model, or train new model and return it
     Args:
@@ -164,6 +171,7 @@ def get_model_for_synthesizer(train_df:pd.DataFrame, class_label:Literal[0,1], s
         synthesizer: tvae (TVAE) or ctgan (CTGAN) used for file name and tracking
         ext: extra extension for file name
         n_epochs: number of epochs (if None we use default setting per case)
+        prn: boolean to control some printing
     Return:
         SDV synthesizer model of type TVAE or CTGAN
     Raises:
@@ -179,11 +187,11 @@ def get_model_for_synthesizer(train_df:pd.DataFrame, class_label:Literal[0,1], s
         label = 'minority' if class_label==1 else 'majority'
         model_path=settings.MODEL_DIR/f'{synthesizer}_{label}_model{ext}.pkl'
         if model_path.exists():
-            print(f'Loading {synthesizer.upper()} model for {label}-Class from {model_path}')
+            if prn: print(f'Loading {synthesizer.upper()} model for {label}-Class from {model_path}')
             model = load_synthesizer(model_path)
             return model
         else:
-            print(f'Start building new {synthesizer.upper()} model for {label}-Class')
+            if prn: print(f'Start building new {synthesizer.upper()} model for {label}-Class')
 
         sdv_input = get_scaled_data_for_synthesizer(train_df, class_label, synthesizer, ext)
         metadata_loaded = get_metadata_for_synthesizer(sdv_input, class_label, synthesizer)
@@ -244,14 +252,22 @@ def get_model_for_synthesizer(train_df:pd.DataFrame, class_label:Literal[0,1], s
 
         model.fit(sdv_input)
         model.save(model_path)
-        print(f'{synthesizer.upper()} Model for {label}-Class saved at {model_path}')
+        if prn: print(f'{synthesizer.upper()} Model for {label}-Class saved at {model_path}')
         return model
     except Exception as e:
         logger.error(f"Error in get_model_for_synthesizer: {e}")
         raise
 
 #----------------------------------------------------------------------------------------
-def get_sample_form_synthesizer(model:TVAESynthesizer | CTGANSynthesizer, num_rows:int, feature_cols:List[str], class_label:Literal[0,1], synthesizer:Literal['tvae','ctgan'], ext:str='')->pd.DataFrame:
+def get_sample_form_synthesizer(
+        model:TVAESynthesizer | CTGANSynthesizer,
+        num_rows:int,
+        feature_cols:List[str],
+        class_label:Literal[0,1],
+        synthesizer:Literal['tvae','ctgan'],
+        ext:str='',
+        prn: bool = True
+    )->pd.DataFrame:
     """
     get scaled data, and save the scaler
     Args:
@@ -261,6 +277,7 @@ def get_sample_form_synthesizer(model:TVAESynthesizer | CTGANSynthesizer, num_ro
         class_label: class label: 0=majority(legit) and 1=minority(fraud)
         synthesizer: tvae (TVAE) or ctgan (CTGAN) used for file name and tracking
         ext: extra extension for file name tracking
+        prn: boolean to control print
     Return:
         dataframe of generated samples
     Raises:
@@ -269,14 +286,14 @@ def get_sample_form_synthesizer(model:TVAESynthesizer | CTGANSynthesizer, num_ro
     try:
         label = 'minority' if class_label==1 else 'majority'
         scaler_path=settings.MODEL_DIR/f'{synthesizer}_{label}_scaler{ext}.pkl'
-        print(f'Loading {synthesizer.upper()} Scaler for {label}-Class from {scaler_path}')
+        if prn: print(f'Loading {synthesizer.upper()} Scaler for {label}-Class from {scaler_path}')
         scaler = joblib.load(scaler_path)
 
         target_col = 'Class'
         T=settings.HOURS_IN_TIME_GROUP
         categorical_cols=[f'Hour/{T}']
 
-        print(f'Start Generating {num_rows} samples ...')
+        if prn: print(f'Start Generating {num_rows} samples ...')
 
         synth_scaled = model.sample(num_rows=num_rows)
         synth_rescaled = synth_scaled.copy()
