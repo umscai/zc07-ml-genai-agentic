@@ -28,6 +28,9 @@ data/creditcard.csv
 data/cleaned_creditcard*.csv
 tvae_model_E*_L*
 ctgan_model_E*_L*
+data/*_train.csv
+data/*_test.csv
+data/*_split_info.csv
 
 out/
 *.bkp

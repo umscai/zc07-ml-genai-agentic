@@ -53,14 +53,19 @@ def db_update_node(state: AgentState, config: RunnableConfig) -> AgentState:
         is_new_insert = None
         if label != 'TRUE_NEGATIVE' and label !='UNKNOWN':
             df1 = pd.DataFrame([features])
-            is_new_insert = add_single_transaction_to_vector_db(
+            is_new_insert, doc_id = add_single_transaction_to_vector_db(
                 df = df1,
                 fraud_prob = fraud_prob,
                 actual_class = actual_class,
                 actual_label= label,
                 node = decision_node
             )
-            response +=f' Vector-dB (LTM) is updated with {label} item.'
+            if is_new_insert:
+                response +=f'{label} with doc-id={doc_id} ADDED to Vector-dB (LTM).'
+            else:
+                response +=f'{label} with doc-id={doc_id} Updated in Vector-dB (LTM).'
+        else:
+            response +=f'{label} NOT added to Vector-dB (LTM).'
 
         response_dic[current_node]=response
         updates = {

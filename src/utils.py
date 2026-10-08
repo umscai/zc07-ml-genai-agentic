@@ -39,6 +39,7 @@ import pprint
 import joblib
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
 from tqdm.auto import tqdm  # Auto-adapts to Notebook or Terminal environment
 from matplotlib.colors import LogNorm
 
@@ -1184,3 +1185,61 @@ def get_val(obj, key):
     if hasattr(obj, key): return getattr(obj, key)
     if isinstance(obj, dict): return obj.get(key)
     return None
+
+#----------------------------------------------------------------------------------------
+def split_labeled_data_to_train_test(tag: str, test_train_ratio:float= 0.5) -> pd.DataFrame:
+    """
+    Loads labeled CSV dataset, based on the tag, split to train and test
+
+    Args:
+        tag: Refer to existing dataset file currently real_data and gen_data
+        test_train_ratio: ration of test to train (default 0.5)
+    Returns:
+        return train and test dataframe, plus train-test split info dataframe
+    Raises:
+        Exception: Re-raises any exception caught during processing after logging.
+    """
+    try:
+        csv_name = f"labeled_dataset_from_{tag}.csv"
+        csv_name_train = f"labeled_dataset_from_{tag}_train.csv"
+        csv_name_test = f"labeled_dataset_from_{tag}_test.csv"
+        csv_name_split_info = f"labeled_dataset_from_{tag}_split_info.csv"
+        csv_path = settings.DATA_DIR / csv_name
+        if csv_path.exists():
+            logger.info(f"Loading existing labeled dataset from: {csv_path}")
+            df = pd.read_csv(csv_path)
+        else:
+            raise ValueError(f"No labeled dataset found for given tag: '{tag}' at path: {csv_path}")
+
+
+        # df columns=['V1', ..., 'V28', 'Amount', 'Class', 'Hour/2', 'fraud_prob', 'label', 'node']
+        stratify_key = df['label'].astype(str) + "_" + df["node"].astype(str)
+        train_df, test_df = train_test_split(
+            df,
+            test_size=test_train_ratio,
+            stratify=stratify_key,
+            random_state=settings.RANDOM_SEED
+        )
+        def get_init(node:str, split:str):
+            return{
+                'node_split': f'{node}-{split}',
+                'TRUE_POSITIVE': 0,
+                'TRUE_NEGATIVE': 0,
+                'FALSE_NEGATIVE': 0,
+                'FALSE_POSITIVE': 0
+                }
+        split_info=[]
+        for split, dfj in zip(['All','Train','Test'], [df, train_df, test_df]):
+            for node in ['Detector','LLM_Agent']:
+                report ={**get_init(node,split),**(dfj[dfj['node']==node].label.value_counts().to_dict())}
+                split_info.append(report)
+
+        split_info_df = pd.DataFrame(split_info)
+
+        train_df.to_csv(settings.DATA_DIR / csv_name_train, index=False)
+        test_df.to_csv(settings.DATA_DIR / csv_name_test, index=False)
+        split_info_df.to_csv(settings.DATA_DIR / csv_name_split_info, index=False)
+        return train_df, test_df, split_info_df
+    except Exception as e:
+        logger.error(f'Error in split_labeled_data_to_train_test: {e}')
+        raise

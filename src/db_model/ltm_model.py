@@ -2,7 +2,7 @@ import shutil
 from pathlib import Path
 import chromadb
 from config import settings
-#from numpy.typing import ArrayLike # for type-hint
+import utils as ut
 import pandas as pd
 import numpy as np
 import logging
@@ -302,8 +302,9 @@ def init_ltm_db(force_reset:bool = False):
         else:
             print(f'No database at {db_path}, Init and setup for the first time!')
 
-        _ = init_vector_db_with_existing_historical_data('real_data')
-        _ = init_vector_db_with_existing_historical_data('gen_data')
+        # We only use train split to initialize LTM (Vector-dB)
+        _ = init_vector_db_with_existing_historical_data('real_data_train')
+        _ = init_vector_db_with_existing_historical_data('gen_data_train')
     except Exception as e:
         logger.error(f"Error in init_ltm_db: {e}")
         raise

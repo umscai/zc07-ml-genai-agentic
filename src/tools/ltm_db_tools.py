@@ -22,7 +22,7 @@ def add_single_transaction_to_vector_db(
     actual_label: str,
     node: Literal["Detector", "LLM_Agent","Human_Agent"],
     collection: Union[chromadb.Collection, None] = None,
-) -> bool:
+) -> tuple[bool,str]:
     """Transforms a single transaction DataFrame row and adds/upserts it into ChromaDB.
 
     Args:
@@ -34,7 +34,7 @@ def add_single_transaction_to_vector_db(
         collection (chromadb.Collection, optional): Chroma collection instance.
 
     Returns:
-        bool: True if the item was newly inserted, False if an existing item was updated.
+        bool: True if the item was newly inserted, False if an existing item was updated. and the doc_id
     """
     try:
         # Ensure input is a single-row DataFrame
@@ -87,7 +87,7 @@ def add_single_transaction_to_vector_db(
         status_str = "Inserted new" if is_new_insert else "Updated existing"
         logger.info(f"{status_str} transaction record in vector DB (ID: {doc_id}).")
 
-        return is_new_insert
+        return is_new_insert, doc_id
 
     except Exception as e:
         logger.error(f'Error in add_single_transaction_to_vector_db: {e}')

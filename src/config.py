@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from pathlib import Path
 from pydantic import computed_field
 import numpy as np
-
+import pandas as pd
 import logging
 import json
 import sys
@@ -162,6 +162,7 @@ class Settings(BaseSettings):
             thr = joblib.load(dual_thr_path)
             self.LOW_THR = thr.get('tau_low', 0.02676)
             self.HIGH_THR = thr.get('tau_high', 0.87015)
+
 #------------------------------------------------------------------------------
 # Create a single instance to be used everywhere
 settings = Settings()
@@ -253,12 +254,43 @@ class CustomLogger:
             )
 
 #------------------------------------------------------------------------------
+def get_epilog_msg():
+    """
+    get test-case-index info, to be append at the end of help in arg-parser
+    """
+    dfi=pd.read_csv(settings.DATA_DIR/'labeled_dataset_from_real_data_split_info.csv')
+    dfi=dfi[dfi['node_split'].str.endswith('-Test')]
+    dfi['node_split']=dfi['node_split'].str.replace('-Test','-real')
+    dfi=dfi.rename(columns={'node_split':'node_source'})
+
+    dfic=pd.read_csv(settings.DATA_DIR/'labeled_dataset_from_gen_data_split_info.csv')
+    dfic=dfic[dfic['node_split'].str.endswith('-Test')]
+    dfic['node_split']=dfic['node_split'].str.replace('-Test','-gen')
+    dfic=dfic.rename(columns={'node_split':'node_source'})
+
+    dfix=pd.concat([dfi, dfic])
+    a=dfix.to_markdown(index=False)
+    output=(
+        f"{'+' * 95}\n"
+        f'test (test-index) ranges depend on the source, node, and labels combinations as shown below:\n'
+        f'e.g. 4 means: available indexes are 1,2,3,4, and 0 means no test-case available\n'
+        f"{'+' * 95}\n"
+        f'\n\n'
+        f'{a}\n'
+        f"{'+' * 95}\n"
+    )
+    return output
+
 def get_args():
     """
     Handles command-line arguments.
     Easily expandable by adding more parser.add_argument() calls.
     """
-    parser = argparse.ArgumentParser(description="Arg Parser")
+    parser = argparse.ArgumentParser(
+        description="Agentic Fraud Detection",
+        epilog=get_epilog_msg(),
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
 
     # Verbose flag: store_true makes it a boolean (True if present, False if not)
     parser.add_argument(
@@ -279,23 +311,27 @@ def get_args():
         type=str,
         choices=['real', 'gen'],
         default='gen',
-        help="source of samples: existing 'real' data, or new 'generated' samples(default: 'gen')"
+        help="source of samples: 'real' data, or 'generated' samples (default: 'gen')"
     )
     parser.add_argument(
-        "-c", "--class_id",
-        type=int,
-        choices=[0, 1],
-        default=1,
-        help="class_id of sample: 0=Legit or 1=Fraud (default: 1)"
+        "-n", "--node",
+        type=str,
+        choices=['det', 'llm'],
+        default='det',
+        help="target-node: Detector or LLM_Agent (default: det)"
     )
-
     parser.add_argument(
-        "-n", "--num",
-        type=int,
-        choices=range(1, 11), # limit the range to avoid LLM-cost
-        default=1,
-        help="Number of transaction-sample (batch) to generate and inject to system(default: 1)"
+        "-l", "--label",
+        type=str,
+        choices=['tn', 'fp', 'fn', 'tp'],
+        default='tp',
+        help="tn: True-Negative, fp: False-Positive, fn: False-Negative, tp: True-Positive (default: tp)"
     )
-
-
+    parser.add_argument(
+        "-t", "--test",
+        type=int,
+        #choices=range(1,11),
+        default=1,
+        help="test case index for selected targets: source, node, label( default: 1)"
+    )
     return parser.parse_args()
