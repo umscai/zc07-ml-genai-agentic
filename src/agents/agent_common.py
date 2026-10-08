@@ -38,13 +38,13 @@ class AgentState(TypedDict):
     # LangGraph Message History (mainly used for auditing)
     messages: Annotated[list[BaseMessage], add_messages] # or remove this line and use class AgentState(MessagesState):
 
-    source_id:Literal['real','gen', ''] # if the transaction is real or generated data (later can be customer id)
+    source_id:Literal['real','gen', 'unknown'] # if the transaction is real or generated data (later can be customer id)
 
     # Transaction info
     features: dict[str, float|int] # V1 to V28, Amount, and HourT=Hour/2
 
     # Actual Class, we have this because we have controlled generated data (otherwise will be determined by post verification)
-    actual_class: Literal [0, 1, 2] | None # 0=Legit, 1=Fraud, 2=unknown
+    actual_class: Literal [0, 1, 2]  # 0=Legit, 1=Fraud, 2=unknown
 
     #predicted class: final prediction by Detector or Agent, or Human
     pred_class: Literal[0, 1, 2]
@@ -78,7 +78,7 @@ class AgentState(TypedDict):
 def get_init_state() -> dict:
     return {
         #'messages': [], # We may not need to re-init with empty list it has operator.add
-        'source_id': '',
+        'source_id': 'unknown',
         'features': {},
         'actual_class': 2,
         'pred_class': 2,

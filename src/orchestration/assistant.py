@@ -47,7 +47,7 @@ class FraudDetectionAssistant:
                 "llm": self.llm
             }
         }
-        actual_class = transaction.pop('Class', None) # only keep features
+        actual_class = transaction.pop('Class', 2) # only keep features
 
         # 2. Format transaction input into a HumanMessage
         user_msg = HumanMessage(content=f"transaction payload for {source_id}: {transaction}")

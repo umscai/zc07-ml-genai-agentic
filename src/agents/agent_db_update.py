@@ -26,12 +26,16 @@ def db_update_node(state: AgentState, config: RunnableConfig) -> AgentState:
         pred_class = state.get("pred_class", 1)
         decision_node = state.get("decision_node", GraphNode.human)
         fraud_prob = state.get("fraud_prob", 1.0)
+        source_id = state.get("source_id", 'unknown')
+        response_dic = state.get("response_dic", {})
 
         lod_id, timestamp_str =log_transaction(
             transaction = features,
             actual_class = actual_class,
-            pred_class = pred_class
+            pred_class = pred_class,
+            source_id = source_id
         )
+        response=f'{timestamp_str}:transaction[{lod_id}] logged to dB.'
 
         if (pred_class == 0) and (actual_class == 0):
             label = 'TRUE_NEGATIVE'
@@ -39,12 +43,15 @@ def db_update_node(state: AgentState, config: RunnableConfig) -> AgentState:
             label = 'FALSE_NEGATIVE'
         elif (pred_class == 1) and (actual_class == 0):
             label = 'FALSE_POSITIVE'
-        else:
+        elif (pred_class == 1) and (actual_class == 1):
             label = 'TRUE_POSITIVE'
+        else:
+            # e.g. actual_label = 2 this scenario will be post process from log_transaction to vector-dB
+            label = 'UNKNOWN'
 
         # We do not log TRUE_NEGATIVE in LTM (vector-dB)
         is_new_insert = None
-        if label != 'TRUE_NEGATIVE':
+        if label != 'TRUE_NEGATIVE' and label !='UNKNOWN':
             df1 = pd.DataFrame([features])
             is_new_insert = add_single_transaction_to_vector_db(
                 df = df1,
@@ -53,7 +60,9 @@ def db_update_node(state: AgentState, config: RunnableConfig) -> AgentState:
                 actual_label= label,
                 node = decision_node
             )
+            response +=f' Vector-dB (LTM) is updated with {label} item.'
 
+        response_dic[current_node]=response
         updates = {
             #'actual_class': actual_class,
             'current_node': current_node,
@@ -61,14 +70,14 @@ def db_update_node(state: AgentState, config: RunnableConfig) -> AgentState:
             #'pred_class': pred_class,
             'next_node': next_node,
             #'action': action,
-            #'response': response,
+            'response_dic': response_dic,
             #"func_used": ['get_fraud_prob_from_ml_classifier'],
             "timestamp_str": timestamp_str,
             "error": None
         }
 
         logging_dict = {
-            "source_id": state.get("source_id"),
+            "source_id": source_id,
             "current_node": current_node,
             "is_new_insert": is_new_insert,
             "lod_id": lod_id,

@@ -46,6 +46,7 @@ class TransLog(Base):
     HourT = Column(Integer, nullable=False)
     actual_class = Column(Integer, nullable=False)
     pred_class = Column(Integer, nullable=False)
+    source_id = Column(String(50), nullable=False, index=True)
 
 
 
