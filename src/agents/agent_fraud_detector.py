@@ -57,6 +57,7 @@ def fraud_detector_node(state: AgentState, config: RunnableConfig) -> AgentState
             'action': action,
             'response_dic': response_dic,
             "func_used": ['get_fraud_prob_from_ml_classifier'],
+            "node_called":[current_node],
             "error": None
         }
         logger.info(f"response={response}")

@@ -45,14 +45,14 @@ def main():
     #     df = ut_test.get_random_sample_from_real_dataset(target_class= class_id, n_samples = num_samples)
     # else:
     #     df = ut_test.get_random_sample_from_generative_model(target_class = class_id, n_samples = num_samples)
-    df = ut_test.get_test_case_sample(
+    df, max_index = ut_test.get_test_case_sample(
         source_id = source_id,
         node_id = node_id,
         label_id = label_id,
         test_id = test_id
     )
     if df is None:
-        print('Invalid test-id for selected source, node, label combination', tag='INVALID-INPUT', tag_color='red')
+        print(f'Invalid test-index={test_id}, max-valid-index={max_index} for selected source/node/label', tag='INVALID-INPUT', tag_color='red')
         print("Please see help for detail info using 'uv run agentic_system.py --help'", tag='See help Menu', tag_color='green')
         sys.exit(0)
     node = ut_test.node_map[node_id]

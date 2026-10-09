@@ -16,7 +16,7 @@ def get_test_case_sample(
         node_id: Literal['det','llm'],
         label_id: Literal['tn','fp','fn', 'tp'],
         test_id: int
-    )->pd.DataFrame | None:
+    )->tuple[pd.DataFrame | None, int]:
     """
     """
     try:
@@ -24,12 +24,13 @@ def get_test_case_sample(
         df=pd.read_csv(file_path)
         df_filtered=df[(df['label']==label_map[label_id]) & (df['node']==node_map[node_id])].reset_index(drop=True)
         df_filtered = df_filtered.drop(columns=['fraud_prob', 'label', 'node'])
-        if 0 < test_id < len(df_filtered):
-            return df_filtered.iloc[[test_id-1]] # return as dataframe
+        max_index = len(df_filtered)
+        if 0 < test_id <= max_index:
+            return df_filtered.iloc[[test_id-1]], max_index # return as dataframe
         elif test_id == -1:
-            return df_filtered
+            return df_filtered, max_index
         else:
-            return None
+            return None, max_index
     except Exception as e:
         logger.error(f'Error in get_test_case_sample: {e}')
         raise

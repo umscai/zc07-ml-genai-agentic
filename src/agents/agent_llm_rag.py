@@ -178,6 +178,7 @@ def llm_rag_node(state: AgentState, config: RunnableConfig) -> AgentState:
             'response_dic': response_dic,
             "tools_used": tools_used,
             "func_used": ['get_top_n_context_for_human'],
+            "node_called":[current_node],
             "messages": ai_msg,
             "llm_confidence": llm_confidence,
             "llm_reasoning" : llm_reasoning,

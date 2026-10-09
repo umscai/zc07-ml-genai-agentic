@@ -67,6 +67,8 @@ class AgentState(TypedDict):
     # Use operator.add so node outputs append to the list instead of replacing it (we need this to keep it as history not part of messages)
     func_used: Annotated[List[str], operator.add]
 
+    node_called: Annotated[List[str], operator.add] # esp want to see how often Human node called
+
     # logging timestamp
     timestamp_str:str
 
@@ -95,6 +97,7 @@ def get_init_state() -> dict:
         'response_dic': {},
         'tool_used': [],
         #'func_used': [], # We may not need to re-init with empty list it has operator.add
+        #'node_called': [],
         'timestamp_str': '',
         'llm_confidence': None,
         'llm_reasoning': None,

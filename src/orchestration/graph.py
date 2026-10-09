@@ -110,7 +110,8 @@ def init_checkpoint_db(force_reset:bool=False):
                 db_path.unlink()
                 print(f"Existing database at {db_path} removed.")
             else:
-                print(f'database already exist at :{db_path} (no action is taken)')
+                #comment this print for less noisy output
+                #print(f'database already exist at :{db_path} (no action is taken)')
                 return
         else:
             print(f'No database at {db_path}, Init and setup for the first time!')

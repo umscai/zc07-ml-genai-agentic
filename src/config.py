@@ -274,6 +274,8 @@ def get_epilog_msg():
         f"{'+' * 95}\n"
         f'test (test-index) ranges depend on the source, node, and labels combinations as shown below:\n'
         f'e.g. 4 means: available indexes are 1,2,3,4, and 0 means no test-case available\n'
+        f'test-index=-1 is special case: we run all samples for the selected source, node, label\n'
+        f'we should be careful when using test-index=-1 with llm-node, because it can be costly!\n'
         f"{'+' * 95}\n"
         f'\n\n'
         f'{a}\n'

@@ -79,6 +79,7 @@ def db_update_node(state: AgentState, config: RunnableConfig) -> AgentState:
             #'action': action,
             'response_dic': response_dic,
             "func_used": func_used,
+            "node_called":[current_node],
             "timestamp_str": timestamp_str,
             "error": None
         }
