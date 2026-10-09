@@ -27,11 +27,11 @@ class GraphNode:
 
 @dataclass
 class GraphAction:
-    escalate: str = 'Escalate'
+    escalate: str = 'ESCALATE'
     #classified: str = 'Classified'
     approved: str = 'APPROVED'
     blocked: str = 'BLOCKED'
-    in_prog:str ="In_Progress"
+    #in_prog:str ="In_Progress"
 
 # Define the state object
 class AgentState(TypedDict):
@@ -58,7 +58,7 @@ class AgentState(TypedDict):
     next_node: GraphNode | None
     current_node: GraphNode | None
     decision_node: GraphNode | None # The node which really make decision as Legit/Fraud(or we could add previous_node, but this will avoid any ambiguity)
-    action: GraphAction
+    action: GraphAction | None
 
     response_dic:dict # short report from Detector, LLM, and Human in dict-format
 
@@ -69,6 +69,10 @@ class AgentState(TypedDict):
 
     # logging timestamp
     timestamp_str:str
+
+    llm_confidence: float | None
+    llm_reasoning: str | None
+    llm_context: str | None #LLM tend to summarize the content when return and we do not force it (to avoid token usage)
 
     #
     error: str | None # in case of node error
@@ -87,11 +91,14 @@ def get_init_state() -> dict:
         'next_node': None,
         'current_node': None,
         'decision_node': None,
-        'action': 'In_Progress',
+        'action': None,
         'response_dic': {},
         'tool_used': [],
         #'func_used': [], # We may not need to re-init with empty list it has operator.add
         'timestamp_str': '',
+        'llm_confidence': None,
+        'llm_reasoning': None,
+        'llm_context': None,
         'error': None
     }
 

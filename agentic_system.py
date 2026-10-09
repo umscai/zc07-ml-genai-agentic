@@ -78,6 +78,16 @@ def main():
                 if resp_dic:
                     for k,v in resp_dic.items():
                         print(f'{v}', tag=f'{k}-node', tag_color=tag_color_map[k])
+                        if k == GraphNode.llm:
+                            print('-'*60)
+                            context = state.get('context',"") # note llm_context is summarized version of context
+                            llm_reasoning = state.get('llm_reasoning',"")
+                            llm_confidence = state.get('llm_confidence',0.0)
+                            print(f':', tag='context', tag_color='yellow')
+                            print(f'{context}')
+                            print(f'{llm_reasoning}', tag='llm_reasoning', tag_color='yellow')
+                            print(f'{llm_confidence}', tag='llm_confidence', tag_color='yellow')
+
     except Exception as e:
         logger.error(f"Error in assistant or main-telemetry loop: {e}")
         print(f"\nUnexpected error: {str(e)}", color='red')

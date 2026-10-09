@@ -10,6 +10,7 @@ from db_model.ltm_model import (
     get_or_create_vector_db_collection,
     query_top_n_closest_from_df,
 )
+from langchain_core.tools import tool
 
 logger = logging.getLogger(__name__)
 
@@ -93,7 +94,7 @@ def add_single_transaction_to_vector_db(
         logger.error(f'Error in add_single_transaction_to_vector_db: {e}')
         raise
 
-
+@tool
 def get_top_n_context(transaction_data:dict['str', float], top_n:int = 3)->str:
     """
     get top_n closest-cosine-distance neighbors from vector-database and format as proper context for LLM-agent
@@ -105,6 +106,27 @@ def get_top_n_context(transaction_data:dict['str', float], top_n:int = 3)->str:
         report in string format
     """
     try:
+        resp_str, _= get_top_n_context_for_human(transaction_data, top_n)
+        return resp_str
+    except Exception as e:
+        logger.error(f'Error in get_top_n_context: {e}')
+        return "No document found"
+
+
+# avoid mixing tool-usage and function call
+def get_top_n_context_for_human(transaction_data:dict['str', float], top_n:int = 3)->tuple[str, pd.DataFrame]:
+    """
+    get top_n closest-cosine-distance neighbors from vector-database and format as proper context for LLM-agent
+    distance is between [0,2] with 0 is the best (exact match), and 2 is the worst
+    Args:
+        - transaction_data: transaction data in dict format [V1 tp V28 and Amount, Hour/2]
+        - top_n: number of top closest results to be reported
+    Return:
+        report in string format, and dataframe format
+    Raises:
+        Exception: Re-raises any exception caught during processing after logging.
+    """
+    try:
         single_row_df = pd.DataFrame([transaction_data])
         resp_df, qid = query_top_n_closest_from_df(single_row_df, top_n=top_n)
         #id 	distance 	Amount 	Hour_Block 	fraud_prob 	actual_class 	label 	node
@@ -113,8 +135,8 @@ def get_top_n_context(transaction_data:dict['str', float], top_n:int = 3)->str:
         resp_str=''
         for j, r in resp_df.iterrows():
             resp_str +=f'[doc-{j+1}]-' + ", ".join(f"{k}: {v}" for k, v in r.items())+"\n"
-        return resp_df, resp_str
+        return resp_str, resp_df
     except Exception as e:
-        logger.error(f'Error in get_top_n_context: {e}')
-        return "No document found"
+        logger.error(f'Error in get_top_n_context_for_human: {e}')
+        raise
 

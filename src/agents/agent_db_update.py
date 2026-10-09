@@ -35,6 +35,7 @@ def db_update_node(state: AgentState, config: RunnableConfig) -> AgentState:
             pred_class = pred_class,
             source_id = source_id
         )
+        func_used=['log_transaction']
         response=f'{timestamp_str}:transaction[{lod_id}] logged to dB.'
 
         if (pred_class == 0) and (actual_class == 0):
@@ -60,6 +61,7 @@ def db_update_node(state: AgentState, config: RunnableConfig) -> AgentState:
                 actual_label= label,
                 node = decision_node
             )
+            func_used.append('add_single_transaction_to_vector_db')
             if is_new_insert:
                 response +=f'{label} with doc-id={doc_id} ADDED to Vector-dB (LTM).'
             else:
@@ -76,7 +78,7 @@ def db_update_node(state: AgentState, config: RunnableConfig) -> AgentState:
             'next_node': next_node,
             #'action': action,
             'response_dic': response_dic,
-            #"func_used": ['get_fraud_prob_from_ml_classifier'],
+            "func_used": func_used,
             "timestamp_str": timestamp_str,
             "error": None
         }
