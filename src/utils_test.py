@@ -26,6 +26,8 @@ def get_test_case_sample(
         df_filtered = df_filtered.drop(columns=['fraud_prob', 'label', 'node'])
         if 0 < test_id < len(df_filtered):
             return df_filtered.iloc[[test_id-1]] # return as dataframe
+        elif test_id == -1:
+            return df_filtered
         else:
             return None
     except Exception as e:

@@ -332,6 +332,6 @@ def get_args():
         type=int,
         #choices=range(1,11),
         default=1,
-        help="test case index for selected targets: source, node, label( default: 1)"
+        help="test case index for selected targets: source, node, label( default: 1), -1 run all available samples!"
     )
     return parser.parse_args()
