@@ -16,7 +16,7 @@ def human_node(state: AgentState, config: RunnableConfig) -> AgentState:
     """
     try:
         current_node = GraphNode.human
-        response_dic = state.get("response_dic", {})
+        response_dic = dict(state.get("response_dic", {})) # or state.get("response_dic", {}).copy() or use ** to unpack current and add/update new item
         # ORACLE
         actual_class = state.get('actual_class','1')
         fraud_prob = state.get("fraud_prob", 1.0)

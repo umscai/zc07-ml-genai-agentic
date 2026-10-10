@@ -22,7 +22,7 @@ def fraud_detector_node(state: AgentState, config: RunnableConfig) -> AgentState
     try:
         source_id = state.get("source_id", 'gen')
         features = state.get("features", {})
-        response_dic = state.get("response_dic", {})
+        response_dic = dict(state.get("response_dic", {})) # or state.get("response_dic", {}).copy() or use ** to unpack current and add/update new item
         actual_class= state.get("actual_class", 2)
         current_node = GraphNode.detector
         #features should not be empty, it will check in assistance before calling the graph

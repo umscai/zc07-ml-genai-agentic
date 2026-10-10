@@ -59,14 +59,16 @@ def main():
     label =ut_test.label_map[label_id]
     logger.info(f"Running test-id: {test_id} using {source_id} data with label:{label}, and target-node:{node}")
 
-    #print(f"Running test-case-{test_case_id} for asset-id:{asset_id} with {num_samples} samples.")
-    print(f"Test-id:{test_id}, Using {source_id} data with label:{label}, and target-node:{node}", tag='Running', tag_color='cyan', color='green')
+    test_cnt = '' if len(df)==1 else f' ({len(df)}-samples)'
+    #print(f"Test-id:{test_id}, Using {source_id} data with label:{label}, and target-node:{node}", tag='Running', tag_color='cyan', color='green')
+    print(f"Test-id:{test_id}{test_cnt}, Using {source_id} data with label:{label}, and target-node:{node}", tag='Running', tag_color='cyan', color='green')
     logger.debug({"msg": "init","status":"success"})
     try:
         assistant = FraudDetectionAssistant()
-        for trans in df.to_dict(orient='records'):
+        for jj, trans in enumerate(df.to_dict(orient='records')):
             #time.sleep(.5) # make sure not faster than 1 sample per seconds!
-            print('+'*100)
+            #print('+'*100)
+            print(f"{'+' * 40} {jj+1:03}/{len(df):03} {'+' * 40}")
             trans_str=f"V1:{trans['V1']:.4f}, ..., V14:{trans['V14']:.4f}, ...,  V28:{trans['V28']:.4f}, , Amount:{trans['Amount']:.2f}, , Hour/2:{trans['Hour/2']}"
             print(f"{trans_str}", tag='TRANSACTION', tag_color='blue', color='yellow')
             result=assistant.run(source_id, trans)

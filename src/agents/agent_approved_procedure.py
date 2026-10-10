@@ -19,7 +19,7 @@ def approved_procedure_node(state: AgentState, config: RunnableConfig) -> AgentS
         current_node = GraphNode.approved
         next_node = GraphNode.dB
         action = GraphAction.approved
-        response_dic = state.get("response_dic", {})
+        response_dic = dict(state.get("response_dic", {})) # or state.get("response_dic", {}).copy() or use ** to unpack current and add/update new item
         response=f'Legit-Transaction {action} (fraud-prob: {fraud_prob:.5%})'
         response_dic[current_node]=response
         updates = {

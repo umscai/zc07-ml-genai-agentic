@@ -19,7 +19,7 @@ def blocked_procedure_node(state: AgentState, config: RunnableConfig) -> AgentSt
         current_node = GraphNode.blocked
         next_node = GraphNode.dB
         action = GraphAction.blocked
-        response_dic = state.get("response_dic", {})
+        response_dic = dict(state.get("response_dic", {})) # or state.get("response_dic", {}).copy() or use ** to unpack current and add/update new item
         response=f'Fraud-Transaction {action} (fraud-prob: {fraud_prob:.5%})'
         response_dic[current_node]=response
         updates = {

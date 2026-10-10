@@ -27,7 +27,7 @@ def db_update_node(state: AgentState, config: RunnableConfig) -> AgentState:
         decision_node = state.get("decision_node", GraphNode.human)
         fraud_prob = state.get("fraud_prob", 1.0)
         source_id = state.get("source_id", 'unknown')
-        response_dic = state.get("response_dic", {})
+        response_dic = dict(state.get("response_dic", {})) # or state.get("response_dic", {}).copy() or use ** to unpack current and add/update new item
 
         lod_id, timestamp_str =log_transaction(
             transaction = features,

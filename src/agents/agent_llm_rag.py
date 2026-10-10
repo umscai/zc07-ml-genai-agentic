@@ -117,7 +117,7 @@ def llm_rag_node(state: AgentState, config: RunnableConfig) -> AgentState:
     try:
         llm = config.get("configurable").get("llm")
         current_node = GraphNode.llm
-        response_dic = state.get("response_dic", {})
+        response_dic = dict(state.get("response_dic", {})) # or state.get("response_dic", {}).copy() or use ** to unpack current and add/update new item
         fraud_prob = state.get("fraud_prob", 1.0)
         features = state.get("features", {})
         context_for_human, _ = get_top_n_context_for_human(features)
