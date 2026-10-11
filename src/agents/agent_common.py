@@ -9,6 +9,12 @@ from typing import Any
 import operator
 import logging
 from dataclasses import asdict, dataclass
+
+from openai import APITimeoutError
+#from langchain_openai import OpenAITimeoutError
+from langchain_core.exceptions import ModelTimeoutError
+from httpx import TimeoutException
+
 logger = logging.getLogger(__name__)
 
 # Define allowed severity band values
@@ -138,6 +144,17 @@ def invoke_react_agent(response_schema: type[BaseModel], messages: List[BaseMess
         tools_used = [t.name for t in result.get("messages", []) if isinstance(t, ToolMessage)]
 
         return result, tools_used
+
+    except (APITimeoutError, ModelTimeoutError, TimeoutException) as e: # OpenAITimeoutError
+        # Handles timeouts whether raised by OpenAI SDK, LangChain adapter, or httpx transport
+        logger.warning(f"Agent execution timed out after retries: {e}")
+
+        #error_message = "The request timed out while waiting for the LLM response. Please try again later."
+        fallback_result = {
+            #"messages": messages + [AIMessage(content=error_message)],
+            "error": "TIMEOUT_ERROR"
+        }
+        return fallback_result, []
     except Exception as e:
         logger.error(f"Error in invoke_react_agent: {e}")
         raise

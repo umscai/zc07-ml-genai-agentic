@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str #= 'OPENAI_API_KEY' # will load OPENAI_API_KEY from .env
     OPENAI_BASE_URL: str # # will load OPENAI_API_KEY from .env
     TEMPERATURE: float # = 0.0 # will load TEMPERATURE from .env and convert to float
-    USE_CONTEXT:bool #will load USE_CONTEXT from .env and convert to boolean
+    #USE_CONTEXT:bool #will load USE_CONTEXT from .env and convert to boolean
     #
     TRANSACTION_DB:str = 'transaction.db'
     LTM_DB:str = 'chroma.sqlite3' # Chroma Vector dB default name
@@ -254,9 +254,9 @@ class CustomLogger:
             )
 
 #------------------------------------------------------------------------------
-def get_epilog_msg():
+def get_test_case_info_df():
     """
-    get test-case-index info, to be append at the end of help in arg-parser
+    get test-case-index info in dataframe format
     """
     dfi=pd.read_csv(settings.DATA_DIR/'labeled_dataset_from_real_data_split_info.csv')
     dfi=dfi[dfi['node_split'].str.endswith('-Test')]
@@ -268,7 +268,16 @@ def get_epilog_msg():
     dfic['node_split']=dfic['node_split'].str.replace('-Test','-gen')
     dfic=dfic.rename(columns={'node_split':'node_source'})
 
-    dfix=pd.concat([dfi, dfic])
+    dfix=pd.concat([dfi, dfic]).reset_index(drop=True)
+    return dfix
+
+
+
+def get_epilog_msg():
+    """
+    get test-case-index info, in text format to be append at the end of help in arg-parser
+    """
+    dfix=get_test_case_info_df()
     a=dfix.to_markdown(index=False)
     output=(
         f"{'+' * 95}\n"

@@ -24,7 +24,14 @@ class FraudDetectionAssistant:
 
         try:
             #ChatOpenAI(api_key=settings.OPENAI_API_KEY, model=settings.MODEL_NAME)
-            self.llm = ChatOpenAI(model=model_name, temperature=temperature, api_key=api_key, base_url=base_url)
+            self.llm = ChatOpenAI(
+                model=model_name,
+                temperature=temperature,
+                api_key=api_key,
+                base_url=base_url,
+                timeout=30.0,  # Total request timeout in seconds
+                max_retries=2
+            )
         except Exception as e:
             raise RuntimeError(f"LLM Initialization failed: {e}")
 

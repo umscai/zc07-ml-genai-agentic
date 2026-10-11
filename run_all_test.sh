@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Record the start time (epoch seconds)
+start_time=$(date +%s)
+
 # Validate that exactly one argument is passed
 if [ "$#" -ne 1 ]; then
     echo "Usage: $0 {det|llm}"
@@ -47,7 +50,15 @@ for cmd in "${commands[@]}"; do
     eval "$cmd"
 done
 
+# Record the end time and calculate difference
+end_time=$(date +%s)
+elapsed=$((end_time - start_time))
 
+# Convert to minutes and seconds
+minutes=$((elapsed / 60))
+seconds=$((elapsed % 60))
+
+echo "Script finished in ${minutes}m ${seconds}s (Total: ${elapsed} seconds)."
 
 #########################
 #1. in terminal run script ./data/x_run_all_test_log.txt, this will capture anything on terminal

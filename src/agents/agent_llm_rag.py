@@ -130,6 +130,32 @@ def llm_rag_node(state: AgentState, config: RunnableConfig) -> AgentState:
         messages = [SystemMessage(content=sys_message)]
 
         result, tools_used = invoke_react_agent(ClassificationOutput, messages, llm, TOOLS)
+        if 'error' in result and result.get('error') == "TIMEOUT_ERROR":
+            pred_class = 2
+            next_node = GraphNode.human
+            decision_node = None
+            action = GraphAction.escalate
+            response=f'{action} to {next_node} for extra investigation due to TIMEOUT_ERROR in LLM-Agent(fraud-prob: {fraud_prob:.5%})'
+            response_dic[current_node]=response
+            updates = {
+                'current_node': current_node,
+                'decision_node': decision_node,
+                'pred_class': pred_class,
+                'next_node': next_node,
+                'action': action,
+                'response_dic': response_dic,
+                #"tools_used": tools_used,
+                "func_used": ['get_top_n_context_for_human'],
+                "node_called":[current_node],
+                #"messages": ai_msg,
+                #"llm_confidence": llm_confidence,
+                #"llm_reasoning" : llm_reasoning,
+                #"llm_context": llm_context,
+                'context': context_for_human,
+                "error": None
+            }
+            logger.info(f"response={response}")
+            return updates
 
         data = result.get("structured_response") if isinstance(result, dict) else result
         ai_msg = result.get("messages", []) if isinstance(result, dict) else []
