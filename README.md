@@ -134,6 +134,11 @@ Project folder and file structures are shown below, where `agentic_system.py` is
 - We use the train-dataset to initialize a vector database as Long-Term Memory
 - We use the test-dataset to evaluate our agentic workflow
 
+### Workflow Graph
+![Graph](./report/latex/img/workflow_graph.png)
+
+
+
 ### Sample run handled by Detector
 ![Det-tp](./report/latex/img/z-det-tp.png)
 ![Det-fp](./report/latex/img/z-det-fp.png)
@@ -222,3 +227,4 @@ numerical value
 - This will create good __F2-Score__ as the target metric (LLM-Agent: F2-Score = `89.74%`)
 - This results suggest that we have to modify our dual-threshold optimization to consider different recall/precision for agent
 - Also we need to collect more data for better estimation of these recall/precision then re-optimized our dual-thresholds
+
