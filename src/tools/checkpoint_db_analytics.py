@@ -165,12 +165,17 @@ class GetWorkflowAnalytics:
 
         node_counts = pd.Series(all_nodes).value_counts(sort=True, ascending=True)
 
+        node_counts_df=node_counts.to_frame(name='usage_count')
+        node_counts_df.index.name = 'node'
+        node_counts_df.to_csv(settings.IMG_DIR / "node_usage.csv")
+
         node_counts.plot(kind="barh", color="tab:orange", figsize=(8, 5)) #color="#9b59b6
         plt.title("Node Usage Count")
         plt.xlabel("Total Number of Executions")
         plt.tight_layout()
         plt.savefig(settings.IMG_DIR / "node_usage.png", dpi=300)
         plt.show()
+        return node_counts_df
 
     # def plot_confidence_distribution(self):
     #     """Plot histogram with KDE for state confidence scores."""

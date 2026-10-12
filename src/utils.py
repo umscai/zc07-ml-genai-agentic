@@ -1244,3 +1244,48 @@ def split_labeled_data_to_train_test(tag: str, test_train_ratio:float= 0.5) -> p
     except Exception as e:
         logger.error(f'Error in split_labeled_data_to_train_test: {e}')
         raise
+
+
+def plot_confusion_matrix_from_test_results_transaction_df(df:pd.DataFrame, sns_cmap:str, ext_ax:Axes, title:str, run_index:int)->dict[str, float]:
+    """
+    A helper function to plot Confusion Matrix from actual_class, and pred_class in transaction dB
+    and return calculated metrics: accuracy, precision, recall, f1-score, f2-score
+    Args:
+        - df: dataframe of transction
+        - sns_cmap: map used for plotting
+        - ext_ax: axis for plot
+        - title: title for plot
+        - run_index: index of LLM run: 1 for fisrt run, and 2 for second run, or 0 if no LLM-run performed
+    Returns:
+        metric dict
+    """
+    try:
+        y = df.actual_class
+        y_pred = df.pred_class
+        cm = confusion_matrix(y, y_pred)
+        cm_xytick=['Not-Fraud', 'Fraud']
+
+        sns.heatmap(cm, annot=True, fmt='d', cmap=sns_cmap, xticklabels=cm_xytick, yticklabels=cm_xytick, ax=ext_ax, annot_kws={'size': 14})
+        accuracy = accuracy_score(y, y_pred)
+        precision = precision_score(y, y_pred, average="binary", zero_division=0)
+        recall = recall_score(y, y_pred, average="binary", zero_division=0)
+        f1 = f1_score(y, y_pred, average="binary", zero_division=0)
+        f2 = fbeta_score(y, y_pred, average='binary', zero_division=0, beta = 2)
+        ext_ax.set_title(title, fontsize=11)
+        ext_ax.set_xlabel('Predicted Label', fontsize=12)
+        ext_ax.set_ylabel('True Label', fontsize=12)
+        #---------------------------------------------------
+
+        metric={
+            "Run": f'Run_{run_index}',
+            "Accuracy":  accuracy,
+            "Precision": precision,
+            "Recall":    recall,
+            "F1-Score":  f1,
+            "F2-Score":  f2,
+        }
+        return metric
+
+    except Exception as e:
+        logger.error(f'Error in plot_confusion_matrix_from_test_results_transaction_df: {e}')
+        raise
