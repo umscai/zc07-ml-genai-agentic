@@ -114,7 +114,7 @@ def get_top_n_context(transaction_data:dict['str', float], top_n:int = 3)->str:
 
 
 # avoid mixing tool-usage and function call
-def get_top_n_context_for_human(transaction_data:dict['str', float], top_n:int = 3)->tuple[str, pd.DataFrame]:
+def get_top_n_context_for_human(transaction_data:dict['str', float], top_n:int = 3)->tuple[str, pd.DataFrame|None]:
     """
     get top_n closest-cosine-distance neighbors from vector-database and format as proper context for LLM-agent
     distance is between [0,2] with 0 is the best (exact match), and 2 is the worst
@@ -127,15 +127,19 @@ def get_top_n_context_for_human(transaction_data:dict['str', float], top_n:int =
         Exception: Re-raises any exception caught during processing after logging.
     """
     try:
-        single_row_df = pd.DataFrame([transaction_data])
-        resp_df, qid = query_top_n_closest_from_df(single_row_df, top_n=top_n)
-        #id 	distance 	Amount 	Hour_Block 	fraud_prob 	actual_class 	label 	node
-        #label and node is for human, not agent, we may include label if agent suppose to do other analysis (not in this project)
-        resp_df =resp_df.drop(columns=['label','node'])
-        resp_str=''
-        for j, r in resp_df.iterrows():
-            resp_str +=f'[doc-{j+1}]-' + ", ".join(f"{k}: {v}" for k, v in r.items())+"\n"
-        return resp_str, resp_df
+        db_path = settings.CHROMA_DIR/settings.CHROMA_DB #'chroma.sqlite3'
+        if db_path.exists():
+            single_row_df = pd.DataFrame([transaction_data])
+            resp_df, qid = query_top_n_closest_from_df(single_row_df, top_n=top_n)
+            #id 	distance 	Amount 	Hour_Block 	fraud_prob 	actual_class 	label 	node
+            #label and node is for human, not agent, we may include label if agent suppose to do other analysis (not in this project)
+            resp_df =resp_df.drop(columns=['label','node'])
+            resp_str=''
+            for j, r in resp_df.iterrows():
+                resp_str +=f'[doc-{j+1}]-' + ", ".join(f"{k}: {v}" for k, v in r.items())+"\n"
+            return resp_str, resp_df
+        else:
+            return '', None
     except Exception as e:
         logger.error(f'Error in get_top_n_context_for_human: {e}')
         raise

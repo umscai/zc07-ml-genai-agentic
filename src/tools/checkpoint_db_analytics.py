@@ -197,7 +197,7 @@ class GetWorkflowAnalytics:
     #     plt.show()
 
 
-def get_checkpoint_df()->pd.DataFrame:
+def get_checkpoint_df()->pd.DataFrame|None:
     """
     get checkpoint-dB data in data-frame format
     Args:
@@ -208,10 +208,14 @@ def get_checkpoint_df()->pd.DataFrame:
         Exception: Re-raises any exception caught during processing after logging.
     """
     try:
-        table_name = 'checkpoints'
-        engine = create_engine(f"sqlite:///{settings.CHECKPOINT_DIR / settings.CHECKPOINT_DB}", echo=False)
-        df = pd.read_sql_table(table_name, engine)
-        return df
+        db_path = settings.CHECKPOINT_DIR / settings.CHECKPOINT_DB
+        if db_path.exists():
+            table_name = 'checkpoints'
+            engine = create_engine(f"sqlite:///{settings.CHECKPOINT_DIR / settings.CHECKPOINT_DB}", echo=False)
+            df = pd.read_sql_table(table_name, engine)
+            return df
+        else:
+            return None
     except Exception as e:
         logger.error(f"Error in get_ltm_df: {e}")
         raise

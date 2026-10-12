@@ -80,7 +80,7 @@ def log_transaction(
         raise
 
 #----------------------------------------------------------------------------------------
-def get_transaction_df()->pd.DataFrame:
+def get_transaction_df()->pd.DataFrame|None:
     """
     get transaction data in data-frame format
     Args:
@@ -91,10 +91,14 @@ def get_transaction_df()->pd.DataFrame:
         Exception: Re-raises any exception caught during processing after logging.
     """
     try:
-        table_name = TransLog.__tablename__ #Direct Attribute Access
-        #[NOTE] we can also use metadata: table_name = TransLog.__table__.name
-        df = pd.read_sql_table(table_name, engine)
-        return df
+        db_path = settings.TRANSACTION_DIR / settings.TRANSACTION_DB
+        if db_path.exists():
+            table_name = TransLog.__tablename__ #Direct Attribute Access
+            #[NOTE] we can also use metadata: table_name = TransLog.__table__.name
+            df = pd.read_sql_table(table_name, engine)
+            return df
+        else:
+            return None
     except Exception as e:
         logger.error(f"Error in get_transaction_df: {e}")
         raise
