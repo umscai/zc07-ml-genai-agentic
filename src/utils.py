@@ -1246,7 +1246,7 @@ def split_labeled_data_to_train_test(tag: str, test_train_ratio:float= 0.5) -> p
         raise
 
 
-def plot_confusion_matrix_from_test_results_transaction_df(df:pd.DataFrame, sns_cmap:str, ext_ax:Axes, title:str, run_index:int)->dict[str, float]:
+def plot_confusion_matrix_from_test_results_transaction_df(df:pd.DataFrame, sns_cmap:str, ext_ax:Axes, title:str, run_index:int|None = None)->dict[str, float]:
     """
     A helper function to plot Confusion Matrix from actual_class, and pred_class in transaction dB
     and return calculated metrics: accuracy, precision, recall, f1-score, f2-score
@@ -1255,7 +1255,7 @@ def plot_confusion_matrix_from_test_results_transaction_df(df:pd.DataFrame, sns_
         - sns_cmap: map used for plotting
         - ext_ax: axis for plot
         - title: title for plot
-        - run_index: index of LLM run: 1 for fisrt run, and 2 for second run, or 0 if no LLM-run performed
+        - run_index: index of LLM run: 1 for fisrt run, and 2 for second run, or 0 if no LLM-run performed (if None use title)
     Returns:
         metric dict
     """
@@ -1275,9 +1275,9 @@ def plot_confusion_matrix_from_test_results_transaction_df(df:pd.DataFrame, sns_
         ext_ax.set_xlabel('Predicted Label', fontsize=12)
         ext_ax.set_ylabel('True Label', fontsize=12)
         #---------------------------------------------------
-
+        run_str = title if run_index is None else f'Run_{run_index}'
         metric={
-            "Run": f'Run_{run_index}',
+            "Run": run_str,
             "Accuracy":  accuracy,
             "Precision": precision,
             "Recall":    recall,

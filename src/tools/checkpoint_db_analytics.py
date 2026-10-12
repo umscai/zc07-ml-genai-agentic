@@ -8,6 +8,65 @@ from config import settings
 from orchestration.graph import build_fraud_detection_workflow
 import logging
 logger = logging.getLogger(__name__)
+from matplotlib.axes import Axes # for type-hint
+
+
+def add_percentage_labels_barh(ax:Axes, format_str="{:.1f}%"):
+    """
+    Helper function to add percentage labels to the right side of horizontal bars,
+    normalized to the maximum value in the plot.
+
+    Args:
+    - ax: matplotlib Axes object
+    - format_str: string format for the percentage (default one decimal place)
+    Returns:
+        None
+    Raises:
+        Exception: Re-raises any exception caught during processing after logging.
+    """
+    try:
+        # Get the maximum width among all bars to use as the 100% baseline
+        patches = ax.patches
+        if not patches:
+            return
+
+        max_width = max(patch.get_width() for patch in patches)
+        if max_width == 0:
+            return
+
+        # Small offset to prevent text from touching the end of the bar
+        offset = max_width * 0.015
+
+        for patch in patches:
+            width = patch.get_width()
+            if width <= 0:
+                continue
+
+            # Calculate percentage relative to the max value
+            percentage = (width / max_width) * 100
+            label_text = format_str.format(percentage)
+
+            # Get the vertical center of the bar
+            y_pos = patch.get_y() + patch.get_height() / 2.0
+
+            # Place text slightly to the right of the bar
+            ax.text(
+                width + offset,
+                y_pos,
+                label_text,
+                va='center',
+                ha='left',
+                fontsize=9,
+                color='black',
+                weight='bold'
+            )
+
+        # Extend the x-axis slightly so the labels aren't cut off at the edge
+        xlim = ax.get_xlim()
+        ax.set_xlim(xlim[0], xlim[1] * 1.15)
+    except Exception as e:
+        logger.error(f'Error in add_percentage_labels_barh: {e}')
+
 
 class GetWorkflowAnalytics:
     """Get and plot token usage, tool usage, func usage, and confidence scores of Assets."""
@@ -129,7 +188,8 @@ class GetWorkflowAnalytics:
         all_tools = [tool for sublist in df_usage["tools_used"] for tool in sublist]
         tool_counts = pd.Series(all_tools).value_counts(sort=True, ascending=True)
 
-        tool_counts.plot(kind="barh", color="tab:green", figsize=(8, 5)) #color="#2ecc71"
+        ax=tool_counts.plot(kind="barh", color="tab:green", figsize=(8, 5)) #color="#2ecc71"
+        add_percentage_labels_barh(ax)
         plt.title("AI-Agent Tool Usage Count")
         plt.xlabel("Total Number of Invocations")
         plt.tight_layout()
@@ -147,7 +207,8 @@ class GetWorkflowAnalytics:
 
         func_counts = pd.Series(all_funcs).value_counts(sort=True, ascending=True)
 
-        func_counts.plot(kind="barh", color="tab:purple", figsize=(8, 5)) #color="#9b59b6"
+        ax=func_counts.plot(kind="barh", color="tab:purple", figsize=(8, 5)) #color="#9b59b6"
+        add_percentage_labels_barh(ax)
         plt.title("Node Functions Usage Count")
         plt.xlabel("Total Number of Executions")
         plt.tight_layout()
@@ -169,7 +230,8 @@ class GetWorkflowAnalytics:
         node_counts_df.index.name = 'node'
         node_counts_df.to_csv(settings.IMG_DIR / "node_usage.csv")
 
-        node_counts.plot(kind="barh", color="tab:orange", figsize=(8, 5)) #color="#9b59b6
+        ax = node_counts.plot(kind="barh", color="tab:orange", figsize=(8, 5)) #color="#9b59b6
+        add_percentage_labels_barh(ax)
         plt.title("Node Usage Count")
         plt.xlabel("Total Number of Executions")
         plt.tight_layout()
