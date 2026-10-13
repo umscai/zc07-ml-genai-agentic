@@ -1,6 +1,6 @@
 # AI system with ML, GenAI, and Agentic workflow
 
-This project introduces a **LangGraph-driven agentic system** that automatically detect credit card fraud transaction. First it uses a trained ML(Machine-Learning) classier with optimized dual thresholds, then escalate the remaining to an LLM-Agent that uses a historical context saved in Chroma Vector database as Long-Term Memory(LTM), again if uncertain will escalate to Human. CTGAN (Conditional Tabular GAN)  generative model is trained and used to generate extra new transaction samples for test and benchmarking the agentic workflow.
+This project introduces a **LangGraph-driven agentic system** that automatically detect credit card fraud transaction. First it uses a trained ML(Machine-Learning) classier with optimized dual thresholds, then escalate the remaining to an LLM-Agent that uses a historical context saved in Chroma Vector database as Long-Term Memory(LTM). If LLM-Agent is uncertain, it  will escalate to Human. CTGAN (Conditional Tabular GAN)  generative model is trained and used to generate extra new transaction samples for test and benchmarking the agentic workflow.
 
 
 __[PDF Report](./report/report.pdf)__
@@ -33,7 +33,7 @@ max@m223:~/x/tmp/zc07-ml-genai-agentic$ uv pip install -e .
 4. __IMPORTANT-1__: run  `uv pip install -e .`, to avoid path resolution especially for `.env` file
 5. __IMPORTANT-2__: This project depends on the parameters in .env located on the project root folder
     - See instruction and required parameters in sample `.env` file: [sample.env](./sample.env), Updating `OPENAI_API_KEY` is __mandatory__, OPENAI_BASE_UR if required, and other parameters are already set with intended values.
-6. __IMPORTANT-3__: If you have `KAGGLE_API_TOKEN`, add it to .env for handeling automatic download of the required dataset, otherwise download it manually as explained above in [Dataset-section](#dataset)
+6. __IMPORTANT-3__: If you have `KAGGLE_API_TOKEN`, add it to .env for handling automatic download of the required dataset, otherwise download it manually as explained above in [Dataset-section](#dataset)
 7. __NOTE__: the results of some time-consuming training (hours) are saved, and when they are exist, they will be loaded, but still we have to run all steps, one by one before running the agentic-system
 
 ### Running (after setup)
@@ -55,7 +55,7 @@ Run jupyter lab, and go to notebook folder
 
 
 ## Folder and File Structure
-Project folder and file structures are shown below, where `agentic_system.py` is main script, and all supporting functions collected `src`, and `out` folder will be generated (after first run) for databases, and logs) while `data` folder is devoted for dataset and other files like trained models, and `report` folder contains report related files, while pdf report will be in details, the html versions of all notebook also added here.
+Project folder and file structures are shown below, where `agentic_system.py` is main script, and all supporting functions collected `src`, and `out` folder will be generated (In first run for databases, and logs) while `data` folder is devoted for dataset and other files like trained models, and `report` folder contains report related files, while pdf report will be in details, the html versions of all notebook also added here.
 
 `run_all_test.sh` is used to run all test, separated with node (det and llm) as command line arguments
 
@@ -64,6 +64,7 @@ Project folder and file structures are shown below, where `agentic_system.py` is
 ├── agentic_system.py
 ├── data
 │   ├── all_test_case_runx2_trans_db.csv
+|   ├── creditcard.csv ........................ NEED to be downloaded manually, if no `KAGGLE_API_TOKEN` provided in .env file
 │   ├── amount_mean_std.pkl
 │   ├── dual_thresholds.pkl
 │   ├── labeled_dataset_from_gen_data.csv
@@ -83,6 +84,7 @@ Project folder and file structures are shown below, where `agentic_system.py` is
 ├── README.md
 ├── report
 │   ├── latex
+│   ├── Reflective_Synthesis_Paper.pdf
 │   ├── step1_ml_clf_with_oversampling.html
 │   ├── step2_genai.html
 │   ├── step3_prepare_data_for_ltm.html
