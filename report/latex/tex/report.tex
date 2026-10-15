@@ -187,11 +187,7 @@ Optimization contour-plot for generated-data shown in Fig.~\ref{fig:dual-thresho
 \label{fig:dual-threshold-opt-effect}
 \end{figure}
 
-As we can see in Fig.~\ref{fig:dual-threshold-opt-effect}:
-\begin{itemize}
-	\item Dual-Threshold-FP = min(Low-Threshold-FP=129, High-Threshold-FP=15)
-	\item Dual-Threshold-FN = min(Low-Threshold-FN=8, High-Threshold-FN=76)
-\end{itemize}
+For example Dual-Threshold-FP = min(129, 15), As we can see in Fig.~\ref{fig:dual-threshold-opt-effect}.
 
 With applying the optimized dual thresholds on real or generated data we can prepare samples to initialize our Long-Term Memory (Vector-database) to be used by LLM-Agent.
 
@@ -282,18 +278,24 @@ The first time we run all test cases, LLM  has only the LTM initialized with (tr
 Comparison between \textbf{Single-Threshold-as-LLM}  and  \textbf{Run-1: LLM-with-LTM} shows that how using LLM with initialized LTM, avoid adding any FN (beyond what happened at detector node which is the accuracy of our Classification-Model), but single -threshold actually adds up 6 more FN, and for FP, while LLM agent add extra 24 FP, but with more mature LTM they can be reduced (as we see in Run-2 as ideal LTM), but single threshold agent add extra 32 FP, which results in 1.34\% reduction in F2-Score (97.29\% to 95.95\%)
 
 Based on the above result (Run-1), we can calculate agent-metrics as : 
+
+\begin{multicols}{4}
 \begin{itemize}
-	\item Accuracy = 80.00\%
-	\item Precision = 63.64\%
-	\item Recall = 100.00\%	
-	\item F2-Score = 89.74\%
+	\item \textbf{Accuracy} 80.00\%
+	\item \textbf{Precision} 63.64\%
+	\item \textbf{Recall}  100.00\%	
+	\item \textbf{F2-Score} 89.74\%
 \end{itemize}
+\end{multicols}
+
+
 This shows that Agent really avoid FN since in the prompt we emphasize that.  Also it shows that the recall/precision for agent is not the same, and after more test, we may need to update our cost function, and define different recall/precision values instead of single accuracy for agent and re-calculate the optimal dual threshold which we consider it as future work after more more tests in real production environment.
 
 Rigorous testing across 661 cases demonstrated strong performance ($F_2$-Score of 97.29\% with LTM). Key takeaways include:
 \begin{itemize}
 	\item \textbf{Successes:} Dual thresholds successfully filtered unambiguous traffic, allowing the LLM and human agents to focus solely on high-risk edge cases. Long-Term Memory (LTM) integration markedly improved sequential accuracy.
 	\item \textbf{Limitations:} Initial agent prompt engineering caused asymmetric precision/recall behavior compared to assumptions in the cost function, highlighting the need to decouple agent-specific precision and recall metrics during optimization.
+	\item  \textbf{Potential Metric Inflation}: Due to limited fraud samples (only 473), the same data (or portions of it) was leveraged in both step-1, and step-2.  This approach was necessary for initial feasibility, it can introduces \textit{data leakage}, potentially leading to optimistic metrics.  Let say, we have 5\% performance inflation, then the realistic F2-Score is  92.2\%.  Solution for production discussed in last section.
 \end{itemize}
 
 \subsection{Agentic System Analytics}
@@ -342,8 +344,8 @@ We also use LangGraph Checkpoint database to  plot our agentic workflow analytic
 It's worth to emphasize the following regarding node-usage:
 \begin{itemize}
 	\item  LLM was only involved in 18.2\% of all interactions
-	\item  Human was only involved in 3.1\% of all interactions
-	\item  which means LLM Escalate and involved Human in $3.1/18.2\approx 0.17 (17\%)$ of its interactions
+	\item  Human involved in 3.1\% of all interactions or $\frac{3.1}{18.2}\approx 17\%$ of LLM interaction.
+	%\item  which means LLM Escalate and involved Human in $3.1/18.2\approx 0.17 (17\%)$ of its interactions
 \end{itemize}
 
 \section{Professional Relevance}
@@ -354,9 +356,8 @@ This project demonstrates end-to-end engineering readiness for modern AI roles b
 	\item Refine the dual-threshold cost function by decoupling distinct agent precision and recall parameters based on production error distributions.
 	\item Deploy real-time feedback loops to continuously update the vector database LTM with live verified outcomes.
 	\item Expand automated evaluation suites to test resilience against evolving, adversarial fraud patterns.
+	\item To avoid possible data leakage due to usage of same data in both step-1: ML-classifier and step-2: Generative model, in production, with the assumption of at least 400-500 samples for robust training of generative model	and 200 samples for final agentic test, we need at least 1200 minority samples, then we can divide dataset into 3 splits of 500 for step-1 (400 for training), 500 for step-2, and 200 for final test. Also this split need to be done properly using stratification on continuous data which has its own challenge (we may need to use quantile-based discretization  prior to stratification).
 \end{enumerate}
-
-
 
 %\section{Overview and Industry Context}
 %Describe the industry problem and why it matters.
@@ -467,7 +468,7 @@ This project demonstrates end-to-end engineering readiness for modern AI roles b
 
 %root@texliveh:/home/dev/xx/zc07-ml-genai-agentic/report/latex/tex# texcount -total report.tex
 %Total
-%Words in text: 1852
+%Words in text: 1999
 %Words in headers: 54
 %Words outside text (captions, etc.): 80
 %Number of headers: 12
@@ -476,4 +477,5 @@ This project demonstrates end-to-end engineering readiness for modern AI roles b
 %Number of math displayed: 0
 %
 %root@texliveh:/home/dev/xx/zc07-ml-genai-agentic/report/latex/tex# 
+
 
