@@ -3,7 +3,7 @@
 This project introduces a **LangGraph-driven agentic system** that automatically detect credit card fraud transaction. First it uses a trained ML(Machine-Learning) classier with optimized dual thresholds, then escalate the remaining to an LLM-Agent that uses a historical context saved in Chroma Vector database as Long-Term Memory(LTM). If LLM-Agent is uncertain, it  will escalate to Human. CTGAN (Conditional Tabular GAN)  generative model is trained and used to generate extra new transaction samples for test and benchmarking the agentic workflow.
 
 
-__[PDF Report](./report/report.pdf)__
+__[PDF Report](./report/Reflective_Synthesis_Paper.pdf)__
 
 ## How to run the project
 ## Dataset
