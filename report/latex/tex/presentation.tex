@@ -5,6 +5,14 @@
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath,amsfonts,amssymb,pxfonts,eulervm,xspace}
 \usepackage{graphicx}
+\graphicspath{
+	{../img/}
+	%   {../img_ipynb/}
+	%	{../img/H1/}
+	%	{../../results/DayResult/}
+}
+\DeclareGraphicsExtensions{.pdf,.jpeg,.png,.jpg}
+\usepackage{booktabs}
 
 \usepackage{calligra}
 \usepackage[T1]{fontenc}
@@ -78,6 +86,129 @@
 %	\end{block}
 \end{frame}
 
+
+\begin{frame}
+\frametitle{Step1}
+\begin{figure}[!tbh]
+	\centering\includegraphics[width=0.7\textwidth]{step1.drawio}
+	%\captionsetup{justification=centering}
+	%\caption{STEP-1}
+	\label{fig:step1}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Step2}
+	\begin{figure}[!tbh]
+		\centering\includegraphics[width=0.6\textwidth]{step2.drawio}
+		%\captionsetup{justification=centering}
+		%\caption{STEP-1}
+		\label{fig:step2}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Step3a}
+	\begin{figure}[!tbh]
+		\centering\includegraphics[width=0.9\textwidth]{step3a.drawio}
+		%\captionsetup{justification=centering}
+		%\caption{STEP-1}
+		\label{fig:step3a}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Step3b}
+	\begin{figure}[!tbh]
+		\centering\includegraphics[width=0.9\textwidth]{step3b.drawio}
+		%\captionsetup{justification=centering}
+		%\caption{STEP-1}
+		\label{fig:step3b}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Step3c1}
+\begin{table}[!h]
+	\centering
+	\caption{Real-Data: Train-Test Split}
+	\label{tab:real-split}
+\begin{tabular}{lrrrr}
+	\toprule
+	node\_split & TP & TN & FN & FP \\
+	\midrule
+	\midrule
+	Detector-All & 450 & 100 & 8 & 4 \\
+	LLM\_Agent-All & 15 & 43 & 0 & 0 \\
+	\midrule
+	Detector-Train & 225 & 50 & 4 & 2 \\
+	LLM\_Agent-Train & 7 & 22 & 0 & 0 \\
+	\midrule
+	Detector-Test & 225 & 50 & 4 & 2 \\
+	LLM\_Agent-Test & 8 & 21 & 0 & 0 \\
+	\bottomrule
+\end{tabular}
+\end{table}	
+	
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{Step3c2}
+	\begin{table}[!h]
+		\centering
+		\caption{Gen-Data: Train-Test Split}
+		\label{tab:genl-split}
+	\begin{tabular}{lrrrr}
+		\toprule
+		node\_split & TP & TN & FN & FP \\
+		\midrule
+		\midrule
+		Detector-All & 397 & 100 & 8 & 15 \\
+		LLM\_Agent-All & 68 & 114 & 0 & 0 \\
+		\midrule
+		Detector-Train & 198 & 50 & 4 & 8 \\
+		LLM\_Agent-Train & 34 & 57 & 0 & 0 \\
+		\midrule
+		Detector-Test & 199 & 50 & 4 & 7 \\
+		LLM\_Agent-Test & 34 & 57 & 0 & 0 \\
+		\bottomrule
+	\end{tabular}
+	\end{table}	
+\end{frame}
+\begin{frame}
+	\frametitle{Step3c3}
+	\begin{table}[!h]
+		\centering
+		\caption{Test-cases}
+		\label{tab:test}
+	\begin{tabular}{lrrrrr}
+		\toprule
+		& TP & TN & FN & FP & Row\_Count \\
+		node\_source &  &  &  &  &  \\
+		\midrule
+		Detector-real & 225 & 50 & 4 & 2 & 281 \\
+		LLM\_Agent-real & 8 & 21 & 0 & 0 & 29 \\
+		Detector-gen & 199 & 50 & 4 & 7 & 260 \\
+		LLM\_Agent-gen & 34 & 57 & 0 & 0 & 91 \\
+		Column\_Sum & 466 & 178 & 8 & 9 & 661 \\
+		\bottomrule
+	\end{tabular}
+	\end{table}		
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{Step4}
+	\begin{figure}[!tbh]
+		\centering\includegraphics[width=0.9\textwidth]{agentic-block-diagram.drawio}
+		%\captionsetup{justification=centering}
+		%\caption{STEP-1}
+		\label{fig:step4}
+	\end{figure}
+\end{frame}
+
+
 \section{Integrated AI System Overview}
 \begin{frame}
 	\frametitle{2. Integrated AI System Overview}
@@ -105,6 +236,13 @@
 %How the integration improved the solution
 %
 %This section demonstrates synthesis across the program.
+
+	\begin{figure}[!tbh]
+	\centering\includegraphics[width=0.7\textwidth]{previous-capstone.drawio}
+	%\captionsetup{justification=centering}
+	%\caption{STEP-1}
+	\label{fig:prev}
+\end{figure}
 \end{frame}
 
 \section{Key Technical Decisions and Tradeoffs}
