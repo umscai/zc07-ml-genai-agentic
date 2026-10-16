@@ -13,6 +13,8 @@
 }
 \DeclareGraphicsExtensions{.pdf,.jpeg,.png,.jpg}
 \usepackage{booktabs}
+\usepackage{multicol}
+\usepackage{subcaption} % Required for subfigures and subcaptions
 
 \usepackage{calligra}
 \usepackage[T1]{fontenc}
@@ -265,7 +267,7 @@
 \begin{frame}
 	\frametitle{4. Key Technical Decisions and Tradeoffs}
 %\addtolength{\itemsep}{17ex} 
-\setbeamercolor{item}{fg=ForestGreen}
+\setbeamercolor{item}{fg=Crimson}
 \begin{enumerate}
 	\setlength{\itemsep}{25pt}
 	\item Step-1: Train, and Select ML Model\\ (among 4 different Oversampling or No Oversampling)	
@@ -348,7 +350,7 @@
 	\frametitle{4. Key Technical Decisions and Tradeoffs (Cont. F)}
 	%select_gen_model_clf_model_pair
 		\begin{figure}[!tbh]
-		\centering\includegraphics[width=0.4\textwidth]{select_gen_model_clf_model_pair}
+		\centering\includegraphics[width=1.0\textwidth]{select_gen_model_clf_model_pair_2x2}
 		%\captionsetup{justification=centering}
 		%\caption{STEP-1}
 		%\label{fig:step1}
@@ -399,12 +401,28 @@
 
 \begin{frame}
 	\frametitle{4. Key Technical Decisions and Tradeoffs (Cont. K)}
+	
+	\setbeamercolor{item}{fg=ForestGreen}
+	\begin{enumerate}
+		\setlength{\itemsep}{25pt}
+		\item Step-1: Train, and Select ML Mode: \textcolor{Crimson}{XGB\_CTGAN}
+		\item Step-2: Train, and Select Generative Model: \textcolor{Crimson}{CTGAN}		 
+		\item Step-3:\\Dual Thresholds:  \textcolor{Crimson}{Optimized},\\ LTM-Warmup-Dataset: \textcolor{Crimson}{Prepared}
+	\end{enumerate}
 \end{frame}
 
 
 \section{Ethical Considerations and Responsible AI}
 \begin{frame}
 	\frametitle{5. Ethical Considerations and Responsible AI}
+	
+\begin{itemize}
+	\setlength{\itemsep}{11pt}
+	\item \textcolor{Crimson}{\textbf{Algorithmic Bias \& False Positives:}} I\textit{mbalanced datasets risk generating biased rules that unfairly target specific demographic spending behaviors as anomalous.}
+	\item \textcolor{ForestGreen}{\textbf{Human-in-the-Loop Accountability:}} \textit{By incorporating mandatory human escalation for low-confidence decisions, the system prevents autonomous wrongful account blocking and ensures user due process.}
+	\item \textcolor{RoyalBlue}{\textbf{Data Privacy:}} \textit{Synthetic data generation (CTGAN) helps mitigate privacy leakage by supplementing training pipelines without over-relying on sensitive real-world cardholder records.}
+\end{itemize}
+
 %Explain ethical risks relevant to your industry and system.
 %
 %You should discuss:
@@ -429,7 +447,131 @@
 %Risks that would need further attention in production
 %
 %Evaluation may be qualitative, quantitative, or mixed.
+\begin{figure}[!tbh]
+	\centering\includegraphics[width=1.0\textwidth]{z-llm-real-tn-10}		
+\end{figure}
 \end{frame}
+
+\begin{frame}
+\frametitle{6. Evaluation, Limitations, and Risks (Cont. A)}
+\begin{table}[!h]
+	\centering
+	\caption{Test-cases Information.}
+	\label{tab:test}
+	\begin{tabular}{lrrrrr}
+		\toprule
+		& TP & TN & FN & FP & Row\_Count \\
+		node\_source &  &  &  &  &  \\
+		\midrule
+		Detector-real & 225 & 50 & 4 & 2 & 281 \\
+		LLM\_Agent-real & 8 & 21 & 0 & 0 & 29 \\
+		Detector-gen & 199 & 50 & 4 & 7 & 260 \\
+		LLM\_Agent-gen & 34 & 57 & 0 & 0 & 91 \\
+		Column\_Sum & 466 & 178 & 8 & 9 & \textbf{661} \\
+		\bottomrule
+	\end{tabular}
+\end{table}		
+
+\end{frame}
+
+\begin{frame}
+	\frametitle{6. Evaluation, Limitations, and Risks (Cont. B)}
+\begin{figure}[!tbh]
+	\centering\includegraphics[width=0.7\textwidth]{conf_mat_all_test_data_cmp}		
+\end{figure}
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{6. Evaluation, Limitations, and Risks (Cont. C)}
+	
+\begin{table}[H]
+	\centering
+	\caption{Metrics for All Test-Case Run.}
+	\label{tab:final-metric}
+	\begin{tabular}{lrrrrr}
+		\toprule
+		Run-Info& Accuracy & Precision & Recall & F1-Score & F2-Score \\	
+		\midrule
+		Perfect & 97.43 & 98.11 & 98.31 & 98.21 & 98.27 \\
+		Single-Thr & 91.68 & 91.82 & 97.05 & 94.36 & 95.95 \\
+		Run-1  & 93.80 & 93.39 & 98.31 & 95.79 & \textbf{97.29} \\
+		Run-2 & 97.43 & 98.11 & 98.31 & 98.21 & 98.27 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+Based on the above result (Run-1), we can calculate agent-metrics as : 
+\begin{multicols}{4}
+	\begin{itemize}
+		\item \textbf{Accuracy} 80.00\%
+		\item \textbf{Precision} 63.64\%
+		\item \textbf{Recall}  100.00\%	
+		\item \textbf{F2-Score} 89.74\%
+	\end{itemize}
+\end{multicols}
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{6. Evaluation, Limitations, and Risks (Cont. D)}
+\begin{itemize}
+	\setlength{\itemsep}{11pt}
+	\item \textcolor{ForestGreen}{\textbf{Successes:}} Dual thresholds successfully filtered unambiguous traffic. LLM+LTM improved sequential accuracy,  and human only involved when necessary.
+	\item \textcolor{RoyalBlue}{\textbf{Limitations:}} Asymmetric precision/recall behavior (cause by Prompt)  we need to decouple agent-specific precision and recall metrics during optimization.
+	\item  \textcolor{Crimson}{\textbf{Potential Metric Inflation}}: Using same data in both step-1, and step-2 was necessary for initial feasibility, it can introduces \textit{data leakage}, potentially leading to optimistic metrics.  Let say, we have 5\% performance inflation, then the realistic F2-Score is  92.2\%. 
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{6. Evaluation, Limitations, and Risks (Cont. E)}
+	
+\begin{figure}[H]
+	\centering
+	% Top-left subplot
+	\begin{subfigure}[b]{0.48\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{token_usage}
+		%\caption{First Plot ($\sin(x)$)}
+		\label{fig:plot1}
+	\end{subfigure}
+	\hfill
+	% Top-right subplot
+	\begin{subfigure}[b]{0.48\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{tool_usage.png}
+		%\caption{Second Plot ($\cos(x)$)}
+		\label{fig:plot2}
+	\end{subfigure}
+	
+	\vspace{1em}
+	
+	% Bottom-left subplot
+	\begin{subfigure}[b]{0.48\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{func_usage.png}
+		%\caption{Third Plot ($e^{-x}$)}
+		\label{fig:plot3}
+	\end{subfigure}
+	\hfill
+	% Bottom-right subplot
+	\begin{subfigure}[b]{0.48\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{node_usage.png}
+		%\caption{Fourth Plot ($\tan(x)$)}
+		\label{fig:plot4}
+	\end{subfigure}
+	
+	\caption{Token, Tool, Function, and Node Usage Analytics.}
+	\label{fig:analytics}
+\end{figure}
+\end{frame}
+
+%\begin{frame}
+%	\frametitle{6. Evaluation, Limitations, and Risks (Cont. A)}
+%\end{frame}
+
 
 \section{Professional Relevance and Next Steps}
 \begin{frame}
@@ -441,8 +583,29 @@
 %What you would improve or extend with more time or resources
 %
 %This section connects your work to professional practice.
+This project demonstrates end-to-end engineering readiness for modern AI roles by successfully bridging traditional predictive modeling, generative data augmentation, and agentic orchestration frameworks (LangGraph). It highlights a practical capability to design cost-aware enterprise systems that balance automated scale with human-in-the-loop safety.
 \end{frame}
 
+
+\begin{frame}
+	\frametitle{7. Professional Relevance and Next Steps (Cont. A)}
+	\begin{enumerate}
+		\item Refine the dual-threshold cost function (different precision and recall for agent)
+		\item Deploy real-time feedback loops to continuously update the vector database LTM
+		\item Expand automated evaluation suites to test resilience against evolving, adversarial fraud patterns.
+		\item To avoid possible data leakage due to usage of same data in step-1: ML-classifier and step-2 Generative Model, and test: When we have enough minority data we can split dat into 3 partitions. Also this split need to be done properly using stratification on continuous data which has its own challenge (we may need to use quantile-based discretization  prior to stratification).
+	\end{enumerate}
+\end{frame}
+%\begin{frame}
+%\frametitle{{7. Professional Relevance and Next Steps (Cont. A)}
+%	
+%\begin{enumerate}
+%	\item Refine the dual-threshold cost function by decoupling distinct agent precision and recall parameters based on production error distributions.
+%	\item Deploy real-time feedback loops to continuously update the vector database LTM with live verified outcomes.
+%	\item Expand automated evaluation suites to test resilience against evolving, adversarial fraud patterns.
+%	\item To avoid possible data leakage due to usage of same data in both step-1: ML-classifier and step-2: Generative model, in production, with the assumption of at least 400-500 samples for robust training of generative model	and 200 samples for final agentic test, we need at least 1200 minority samples, then we can divide dataset into 3 splits of 500 for step-1 (400 for training), 500 for step-2, and 200 for final test. Also this split need to be done properly using stratification on continuous data which has its own challenge (we may need to use quantile-based discretization  prior to stratification).
+%\end{enumerate}
+%\end{frame}
 	
 \end{document}
 
