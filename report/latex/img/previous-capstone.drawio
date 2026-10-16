@@ -1,19 +1,19 @@
 <mxfile host="Electron">
   <diagram name="Page-1" id="hH1QHRjGWtyiIwT-9qTw">
-    <mxGraphModel dx="1178" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1414" dy="840" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="34VFXi7Oasb0RHBLb-fB-2" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;gradientColor=#7ea6e0;strokeColor=#6c8ebf;" value="Capstone-3: Applied Machine Learning (&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Credit Card Fraud Detection)&lt;/span&gt;" vertex="1">
           <mxGeometry height="120" width="420" x="128" y="240" as="geometry" />
         </mxCell>
-        <mxCell id="34VFXi7Oasb0RHBLb-fB-3" parent="34VFXi7Oasb0RHBLb-fB-2" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Using same dataset, and same ML model (XGBoost)" vertex="1">
+        <mxCell id="34VFXi7Oasb0RHBLb-fB-3" parent="34VFXi7Oasb0RHBLb-fB-2" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Used XGBoost with cost-sensitive learning, and NO Over-Sampling" vertex="1">
           <mxGeometry height="30" width="420" y="30" as="geometry" />
         </mxCell>
-        <mxCell id="34VFXi7Oasb0RHBLb-fB-4" parent="34VFXi7Oasb0RHBLb-fB-2" style="text;strokeColor=#d6b656;fillColor=#fff2cc;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Here using 2-hour as hour-block instead of hour (differet feature engineering)" vertex="1">
+        <mxCell id="34VFXi7Oasb0RHBLb-fB-4" parent="34VFXi7Oasb0RHBLb-fB-2" style="text;strokeColor=#d6b656;fillColor=#fff2cc;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Here, Improved Feature Engineering of Time to 2-hour as hour-block" vertex="1">
           <mxGeometry height="30" width="420" y="60" as="geometry" />
         </mxCell>
-        <mxCell id="34VFXi7Oasb0RHBLb-fB-5" parent="34VFXi7Oasb0RHBLb-fB-2" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="No oversampling used in Capstone-3, Here we use 4 different oversampling" vertex="1">
+        <mxCell id="34VFXi7Oasb0RHBLb-fB-5" parent="34VFXi7Oasb0RHBLb-fB-2" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Here we use 4 different Over-Sampling (improving Recall)" vertex="1">
           <mxGeometry height="30" width="420" y="90" as="geometry" />
         </mxCell>
         <mxCell id="34VFXi7Oasb0RHBLb-fB-6" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;gradientColor=#97d077;strokeColor=#82b366;" value="Capstone-5: Generative AI Applications (Anime Face Generation with VAE)" vertex="1">
@@ -25,26 +25,23 @@
         <mxCell id="34VFXi7Oasb0RHBLb-fB-8" parent="34VFXi7Oasb0RHBLb-fB-6" style="text;strokeColor=#d6b656;fillColor=#fff2cc;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Here we use Tabular version of VAE (TVAE) for transaction data generation" vertex="1">
           <mxGeometry height="30" width="456" y="60" as="geometry" />
         </mxCell>
-        <mxCell id="34VFXi7Oasb0RHBLb-fB-9" parent="34VFXi7Oasb0RHBLb-fB-6" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="We also use CTGAN for data generation to select the best netween TVAE/CTGAN" vertex="1">
+        <mxCell id="34VFXi7Oasb0RHBLb-fB-9" parent="34VFXi7Oasb0RHBLb-fB-6" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="We also use CTGAN for data generation to select the best between TVAE/CTGAN" vertex="1">
           <mxGeometry height="30" width="456" y="90" as="geometry" />
         </mxCell>
         <mxCell id="34VFXi7Oasb0RHBLb-fB-10" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;gradientColor=#ea6b66;strokeColor=#b85450;" value="&lt;div&gt;Capstone-6: Agentic AI Systems(Industrial Equipment Anomaly &amp;amp; Incident&amp;nbsp;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Response Agent)&lt;/span&gt;&lt;/div&gt;" vertex="1">
-          <mxGeometry height="180" width="540" x="68" y="500" as="geometry" />
+          <mxGeometry height="150" width="540" x="68" y="500" as="geometry" />
         </mxCell>
-        <mxCell id="34VFXi7Oasb0RHBLb-fB-11" parent="34VFXi7Oasb0RHBLb-fB-10" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Both Capstone-6 and this project are using Agentic system for anomaly/fraud detection" vertex="1">
+        <mxCell id="34VFXi7Oasb0RHBLb-fB-11" parent="34VFXi7Oasb0RHBLb-fB-10" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="In Capstone-6 No Real Dataset (data was simulated), no ML-Classifier, and No Vector-dB" vertex="1">
           <mxGeometry height="30" width="540" y="30" as="geometry" />
         </mxCell>
-        <mxCell id="34VFXi7Oasb0RHBLb-fB-12" parent="34VFXi7Oasb0RHBLb-fB-10" style="text;strokeColor=#d6b656;fillColor=#fff2cc;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Capstone-6 did not have any real dataset, we use statistical method to generate data" vertex="1">
+        <mxCell id="34VFXi7Oasb0RHBLb-fB-12" parent="34VFXi7Oasb0RHBLb-fB-10" style="text;strokeColor=#d6b656;fillColor=#fff2cc;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Here We have Real-Dataset, Also we use Generative Model to generate new data" vertex="1">
           <mxGeometry height="30" width="540" y="60" as="geometry" />
         </mxCell>
-        <mxCell id="34VFXi7Oasb0RHBLb-fB-13" parent="34VFXi7Oasb0RHBLb-fB-10" style="text;strokeColor=#d6b656;fillColor=#fff2cc;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Here we have real-dataset, and also we use generative model to generate new data" vertex="1">
+        <mxCell id="34VFXi7Oasb0RHBLb-fB-13" parent="34VFXi7Oasb0RHBLb-fB-10" style="text;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="Hear We Use ML-Classifier with Optimized Dual Threshold as First Stage Detector" vertex="1">
           <mxGeometry height="30" width="540" y="90" as="geometry" />
         </mxCell>
-        <mxCell id="34VFXi7Oasb0RHBLb-fB-18" parent="34VFXi7Oasb0RHBLb-fB-10" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="In Capstone 6 no trained ML as first stage detector, we only use statistical thresholding to classify" vertex="1">
+        <mxCell id="34VFXi7Oasb0RHBLb-fB-18" parent="34VFXi7Oasb0RHBLb-fB-10" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Also We have Vector-dB as Long-Term Memory for historical Context reterival (RAG)" vertex="1">
           <mxGeometry height="30" width="540" y="120" as="geometry" />
-        </mxCell>
-        <mxCell id="34VFXi7Oasb0RHBLb-fB-19" parent="34VFXi7Oasb0RHBLb-fB-10" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Here we have a trained ML classifier with optimized dual thresholds as first stage detector" vertex="1">
-          <mxGeometry height="30" width="540" y="150" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

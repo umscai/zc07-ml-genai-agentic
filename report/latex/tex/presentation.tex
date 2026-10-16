@@ -16,6 +16,7 @@
 
 \usepackage{calligra}
 \usepackage[T1]{fontenc}
+%\usepackage{enumitem}
 
 \setbeamercolor{mycolor}{fg=RoyalBlue,bg=GreenYellow}
 %check this for block coloring
@@ -31,7 +32,7 @@
 \title[Integrative Industry Synthesis] %optional
 {Integrative Industry Synthesis}
 
-\subtitle{Agentic Credit Card Fraud Detection, \\with ML-Classifier and Generative Models}
+\subtitle{Agentic Fraud Detection via Dual-Threshold ML Classification\\and Generative Data Augmentation \& Benchmarking}
 
 \author[M.R.  Udacity Institute of AI \& Technology] % (optional, for multiple authors)
 {Max Raxy\\ Udacity Institute of AI \& Technology
@@ -71,6 +72,15 @@
 \section{Industry Context and Problem Definition}
 \begin{frame}
 	\frametitle{1. Industry Context and Problem Definition}
+\begin{itemize}
+	\item Credit card fraud detection
+	\item Critical \& challenge in the \textcolor{Crimson}{\textbf{Financial Industry}}.
+	\item Heavily imbalanced ( Fraud-Class < 0.2\% )
+	\item FN: cost, reputational damage
+	\item FP: customer friction and operational review costs
+	\item Balancing High Recall with Precision in automated risk mitigation
+	\item AI can help
+\end{itemize} 
 %Explain:
 %
 %The industry or sector you selected
@@ -87,131 +97,137 @@
 \end{frame}
 
 
-\begin{frame}
-\frametitle{Step1}
-\begin{figure}[!tbh]
-	\centering\includegraphics[width=0.7\textwidth]{step1.drawio}
-	%\captionsetup{justification=centering}
-	%\caption{STEP-1}
-	\label{fig:step1}
-\end{figure}
-\end{frame}
-
-\begin{frame}
-	\frametitle{Step2}
-	\begin{figure}[!tbh]
-		\centering\includegraphics[width=0.6\textwidth]{step2.drawio}
-		%\captionsetup{justification=centering}
-		%\caption{STEP-1}
-		\label{fig:step2}
-	\end{figure}
-\end{frame}
-
-\begin{frame}
-	\frametitle{Step3a}
-	\begin{figure}[!tbh]
-		\centering\includegraphics[width=0.9\textwidth]{step3a.drawio}
-		%\captionsetup{justification=centering}
-		%\caption{STEP-1}
-		\label{fig:step3a}
-	\end{figure}
-\end{frame}
-
-\begin{frame}
-	\frametitle{Step3b}
-	\begin{figure}[!tbh]
-		\centering\includegraphics[width=0.9\textwidth]{step3b.drawio}
-		%\captionsetup{justification=centering}
-		%\caption{STEP-1}
-		\label{fig:step3b}
-	\end{figure}
-\end{frame}
-
-\begin{frame}
-	\frametitle{Step3c1}
-\begin{table}[!h]
-	\centering
-	\caption{Real-Data: Train-Test Split}
-	\label{tab:real-split}
-\begin{tabular}{lrrrr}
-	\toprule
-	node\_split & TP & TN & FN & FP \\
-	\midrule
-	\midrule
-	Detector-All & 450 & 100 & 8 & 4 \\
-	LLM\_Agent-All & 15 & 43 & 0 & 0 \\
-	\midrule
-	Detector-Train & 225 & 50 & 4 & 2 \\
-	LLM\_Agent-Train & 7 & 22 & 0 & 0 \\
-	\midrule
-	Detector-Test & 225 & 50 & 4 & 2 \\
-	LLM\_Agent-Test & 8 & 21 & 0 & 0 \\
-	\bottomrule
-\end{tabular}
-\end{table}	
-	
-\end{frame}
-
-
-\begin{frame}
-	\frametitle{Step3c2}
-	\begin{table}[!h]
-		\centering
-		\caption{Gen-Data: Train-Test Split}
-		\label{tab:genl-split}
-	\begin{tabular}{lrrrr}
-		\toprule
-		node\_split & TP & TN & FN & FP \\
-		\midrule
-		\midrule
-		Detector-All & 397 & 100 & 8 & 15 \\
-		LLM\_Agent-All & 68 & 114 & 0 & 0 \\
-		\midrule
-		Detector-Train & 198 & 50 & 4 & 8 \\
-		LLM\_Agent-Train & 34 & 57 & 0 & 0 \\
-		\midrule
-		Detector-Test & 199 & 50 & 4 & 7 \\
-		LLM\_Agent-Test & 34 & 57 & 0 & 0 \\
-		\bottomrule
-	\end{tabular}
-	\end{table}	
-\end{frame}
-\begin{frame}
-	\frametitle{Step3c3}
-	\begin{table}[!h]
-		\centering
-		\caption{Test-cases}
-		\label{tab:test}
-	\begin{tabular}{lrrrrr}
-		\toprule
-		& TP & TN & FN & FP & Row\_Count \\
-		node\_source &  &  &  &  &  \\
-		\midrule
-		Detector-real & 225 & 50 & 4 & 2 & 281 \\
-		LLM\_Agent-real & 8 & 21 & 0 & 0 & 29 \\
-		Detector-gen & 199 & 50 & 4 & 7 & 260 \\
-		LLM\_Agent-gen & 34 & 57 & 0 & 0 & 91 \\
-		Column\_Sum & 466 & 178 & 8 & 9 & 661 \\
-		\bottomrule
-	\end{tabular}
-	\end{table}		
-\end{frame}
-
-
-\begin{frame}
-	\frametitle{Step4}
-	\begin{figure}[!tbh]
-		\centering\includegraphics[width=0.9\textwidth]{agentic-block-diagram.drawio}
-		%\captionsetup{justification=centering}
-		%\caption{STEP-1}
-		\label{fig:step4}
-	\end{figure}
-\end{frame}
-
+%\begin{frame}
+%\frametitle{Step1}
+%\begin{figure}[!tbh]
+%	\centering\includegraphics[width=0.7\textwidth]{step1.drawio}
+%	%\captionsetup{justification=centering}
+%	%\caption{STEP-1}
+%	\label{fig:step1}
+%\end{figure}
+%\end{frame}
+%
+%\begin{frame}
+%	\frametitle{Step2}
+%	\begin{figure}[!tbh]
+%		\centering\includegraphics[width=0.6\textwidth]{step2.drawio}
+%		%\captionsetup{justification=centering}
+%		%\caption{STEP-1}
+%		\label{fig:step2}
+%	\end{figure}
+%\end{frame}
+%
+%\begin{frame}
+%	\frametitle{Step3a}
+%	\begin{figure}[!tbh]
+%		\centering\includegraphics[width=0.9\textwidth]{step3a.drawio}
+%		%\captionsetup{justification=centering}
+%		%\caption{STEP-1}
+%		\label{fig:step3a}
+%	\end{figure}
+%\end{frame}
+%
+%\begin{frame}
+%	\frametitle{Step3b}
+%	\begin{figure}[!tbh]
+%		\centering\includegraphics[width=0.9\textwidth]{step3b.drawio}
+%		%\captionsetup{justification=centering}
+%		%\caption{STEP-1}
+%		\label{fig:step3b}
+%	\end{figure}
+%\end{frame}
+%
+%\begin{frame}
+%	\frametitle{Step3c1}
+%\begin{table}[!h]
+%	\centering
+%	\caption{Real-Data: Train-Test Split}
+%	\label{tab:real-split}
+%\begin{tabular}{lrrrr}
+%	\toprule
+%	node\_split & TP & TN & FN & FP \\
+%	\midrule
+%	\midrule
+%	Detector-All & 450 & 100 & 8 & 4 \\
+%	LLM\_Agent-All & 15 & 43 & 0 & 0 \\
+%	\midrule
+%	Detector-Train & 225 & 50 & 4 & 2 \\
+%	LLM\_Agent-Train & 7 & 22 & 0 & 0 \\
+%	\midrule
+%	Detector-Test & 225 & 50 & 4 & 2 \\
+%	LLM\_Agent-Test & 8 & 21 & 0 & 0 \\
+%	\bottomrule
+%\end{tabular}
+%\end{table}	
+%	
+%\end{frame}
+%
+%
+%\begin{frame}
+%	\frametitle{Step3c2}
+%	\begin{table}[!h]
+%		\centering
+%		\caption{Gen-Data: Train-Test Split}
+%		\label{tab:genl-split}
+%	\begin{tabular}{lrrrr}
+%		\toprule
+%		node\_split & TP & TN & FN & FP \\
+%		\midrule
+%		\midrule
+%		Detector-All & 397 & 100 & 8 & 15 \\
+%		LLM\_Agent-All & 68 & 114 & 0 & 0 \\
+%		\midrule
+%		Detector-Train & 198 & 50 & 4 & 8 \\
+%		LLM\_Agent-Train & 34 & 57 & 0 & 0 \\
+%		\midrule
+%		Detector-Test & 199 & 50 & 4 & 7 \\
+%		LLM\_Agent-Test & 34 & 57 & 0 & 0 \\
+%		\bottomrule
+%	\end{tabular}
+%	\end{table}	
+%\end{frame}
+%\begin{frame}
+%	\frametitle{Step3c3}
+%	\begin{table}[!h]
+%		\centering
+%		\caption{Test-cases}
+%		\label{tab:test}
+%	\begin{tabular}{lrrrrr}
+%		\toprule
+%		& TP & TN & FN & FP & Row\_Count \\
+%		node\_source &  &  &  &  &  \\
+%		\midrule
+%		Detector-real & 225 & 50 & 4 & 2 & 281 \\
+%		LLM\_Agent-real & 8 & 21 & 0 & 0 & 29 \\
+%		Detector-gen & 199 & 50 & 4 & 7 & 260 \\
+%		LLM\_Agent-gen & 34 & 57 & 0 & 0 & 91 \\
+%		Column\_Sum & 466 & 178 & 8 & 9 & 661 \\
+%		\bottomrule
+%	\end{tabular}
+%	\end{table}		
+%\end{frame}
+%
+%
+%\begin{frame}
+%	\frametitle{Step4}
+%	\begin{figure}[!tbh]
+%		\centering\includegraphics[width=0.9\textwidth]{agentic-block-diagram.drawio}
+%		%\captionsetup{justification=centering}
+%		%\caption{STEP-1}
+%		\label{fig:step4}
+%	\end{figure}
+%\end{frame}
+%
 
 \section{Integrated AI System Overview}
 \begin{frame}
 	\frametitle{2. Integrated AI System Overview}
+	\begin{figure}[!tbh]
+	\centering\includegraphics[width=0.9\textwidth]{agentic-block-diagram.drawio}
+	%\captionsetup{justification=centering}
+	%\caption{STEP-1}
+	\label{fig:step4}
+\end{figure}
 %Describe the integrated system, framework, or case study you designed.
 %
 %You should explain:
@@ -248,6 +264,14 @@
 \section{Key Technical Decisions and Tradeoffs}
 \begin{frame}
 	\frametitle{4. Key Technical Decisions and Tradeoffs}
+%\addtolength{\itemsep}{17ex} 
+\setbeamercolor{item}{fg=ForestGreen}
+\begin{enumerate}
+	\setlength{\itemsep}{25pt}
+	\item Step-1: Train, and Select ML Model\\ (among 4 different Oversampling or No Oversampling)	
+	\item Step-2: Train, and Select Generative Model \\(between TVAE and CTGAN)
+	\item Step-3: Define and Optimize Dual Thresholds,\\ and Prepare Data for LTM initialization (warm-up)
+\end{enumerate}
 	
 %Explain the most important technical decisions you made.
 %
@@ -259,6 +283,124 @@
 %
 %You are not expected to claim your choices were perfect. Honest reasoning is expected.	
 \end{frame}
+
+\begin{frame}
+	\frametitle{4. Key Technical Decisions and Tradeoffs (Cont. A)}
+		\begin{figure}[!tbh]
+		\centering\includegraphics[width=0.7\textwidth]{step1.drawio}
+		%\captionsetup{justification=centering}
+		%\caption{STEP-1}
+		%\label{fig:step1}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{4. Key Technical Decisions and Tradeoffs (Cont. B)}
+		\begin{figure}[!tbh]
+		\centering\includegraphics[width=1.0\textwidth]{bar-auc}
+		%\captionsetup{justification=centering}
+		%\caption{STEP-1}
+		%\label{fig:step1}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{4. Key Technical Decisions and Tradeoffs (Cont. C)}
+	\begin{figure}[!tbh]
+		\centering\includegraphics[width=0.65\textwidth]{bar-best-th}
+		%\captionsetup{justification=centering}
+		%\caption{STEP-1}
+		%\label{fig:step1}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{4. Key Technical Decisions and Tradeoffs (Cont. D)}
+		\begin{figure}[!tbh]
+		\centering\includegraphics[width=0.5\textwidth]{step2.drawio}
+		%\captionsetup{justification=centering}
+		%\caption{STEP-1}
+		%\label{fig:step1}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{4. Key Technical Decisions and Tradeoffs (Cont. E)}
+\begin{table}[H]
+	\centering
+	\caption{Numerical Comparison of Generative models: TVAE vs CTGAN}
+	\label{tab:gen-model-quality-score}
+	\begin{tabular}{l l c c}
+		\toprule
+		Class Subset & Model & Overall Score & Feat. Wins (out of 30) \\
+		\midrule
+		\textbf{Fraud ($Class = 1$)} & \textbf{TVAE} & \textbf{87.51\%} & \textbf{24 (80\%)} \\
+		& CTGAN & 67.27\% & 6 (20\%)\\
+		\addlinespace
+		\textbf{Legit ($Class = 0$)} & TVAE & 91.16\% & 13 (43.3\%) \\
+		& \textbf{CTGAN} & \textbf{91.62\%} & \textbf{17 (56.7\%)} \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+\end{frame}
+
+\begin{frame}
+	\frametitle{4. Key Technical Decisions and Tradeoffs (Cont. F)}
+	%select_gen_model_clf_model_pair
+		\begin{figure}[!tbh]
+		\centering\includegraphics[width=0.4\textwidth]{select_gen_model_clf_model_pair}
+		%\captionsetup{justification=centering}
+		%\caption{STEP-1}
+		%\label{fig:step1}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{4. Key Technical Decisions and Tradeoffs (Cont. G)}
+			\begin{figure}[!tbh]
+		\centering\includegraphics[width=0.8\textwidth]{step3a.drawio}
+		%\captionsetup{justification=centering}
+		%\caption{STEP-1}
+		%\label{fig:step1}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{4. Key Technical Decisions and Tradeoffs (Cont. H)}
+		\begin{figure}[!tbh]
+		\centering\includegraphics[width=0.8\textwidth]{step3b.drawio}
+		%\captionsetup{justification=centering}
+		%\caption{STEP-1}
+		%\label{fig:step1}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{4. Key Technical Decisions and Tradeoffs (Cont. I)}
+		\begin{figure}[!tbh]
+		\centering\includegraphics[width=0.8\textwidth]{dual_thr_opt_gen_data}
+		%\captionsetup{justification=centering}
+		%\caption{STEP-1}
+		%\label{fig:step1}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{4. Key Technical Decisions and Tradeoffs (Cont. J)}
+			\begin{figure}[!tbh]
+		\centering\includegraphics[width=1.0\textwidth]{dual_thr_conf_mat_gen_data}
+		%\captionsetup{justification=centering}
+		%\caption{STEP-1}
+		%\label{fig:step1}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{4. Key Technical Decisions and Tradeoffs (Cont. K)}
+\end{frame}
+
 
 \section{Ethical Considerations and Responsible AI}
 \begin{frame}
