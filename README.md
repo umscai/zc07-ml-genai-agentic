@@ -3,7 +3,11 @@
 This project introduces a **LangGraph-driven agentic system** that automatically detect credit card fraud transaction. First it uses a trained ML(Machine-Learning) classier with optimized dual thresholds, then escalate the remaining to an LLM-Agent that uses a historical context saved in Chroma Vector database as Long-Term Memory(LTM). If LLM-Agent is uncertain, it  will escalate to Human. CTGAN (Conditional Tabular GAN)  generative model is trained and used to generate extra new transaction samples for test and benchmarking the agentic workflow.
 
 
-__[PDF Report](./report/Reflective_Synthesis_Paper.pdf)__
+- __[PDF Report](./report/report.pdf)__
+- __[Presentation Slides](./report/presentation.pdf)__
+
+## System Diagram
+![Sys-Diagram](./report/latex/img/agentic-block-diagram.drawio.png)
 
 ## How to run the project
 ## Dataset
@@ -84,7 +88,8 @@ Project folder and file structures are shown below, where `agentic_system.py` is
 ├── README.md
 ├── report
 │   ├── latex
-│   ├── Reflective_Synthesis_Paper.pdf
+│   ├── presentation.pdf
+│   ├── report.pdf
 │   ├── step1_ml_clf_with_oversampling.html
 │   ├── step2_genai.html
 │   ├── step3_prepare_data_for_ltm.html
@@ -138,8 +143,6 @@ Project folder and file structures are shown below, where `agentic_system.py` is
 
 ### Workflow Graph
 ![Graph](./report/latex/img/workflow_graph.png)
-
-
 
 ### Sample run handled by Detector
 ![Det-tp](./report/latex/img/z-det-tp.png)
@@ -195,6 +198,7 @@ numerical value
 - Using agentic workflow have better performance
 - Also using agentic workflow is more reliable that having a single-threshold that may need keep re-tuning
 - System performance (called __Run-1__: when we load train-dataset to LTM, and test based on test-dataset) is about __F2-Score = `97.3%`__
+- Detailed discussion on possible __metric inflation__ (inevitable in this feasible study), and solution in production, is given in [pdf-report](./report/report.pdf), and the realistic performance with `5%` inflation assumption can be `92.3%`.
 
 
 
